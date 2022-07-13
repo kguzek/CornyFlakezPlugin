@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<WeaponLoadouts>
+	<OffDuty>
+		<Weapon ammo="48">
+			<Name>CombatPistol</Name>
+			<Components>
+				<Component>COMPONENT_AT_PI_FLSH</Component>
+			</Components>
+		</Weapon>
+	</OffDuty>
+	<OnDuty>
+		<Weapon ammo="48">
+			<Name>CombatPistol</Name>
+			<Components>
+				<Component>COMPONENT_AT_PI_FLSH</Component>
+			</Components>
+		</Weapon>
+		<Weapon>Nightstick</Weapon>
+		<Weapon>Flashlight</Weapon>
+		<Weapon>StunGun</Weapon>
+		<Weapon>FireExtinguisher</Weapon>
+	</OnDuty>
+</WeaponLoadouts>

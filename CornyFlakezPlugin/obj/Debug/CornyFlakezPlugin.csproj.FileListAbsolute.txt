@@ -1,0 +1,6 @@
+C:\Users\USER\Documents\Coding\C#\CornyFlakezPlugin\CornyFlakezPlugin\obj\Debug\CornyFlakezPlugin.csproj.AssemblyReference.cache
+C:\Users\USER\Documents\Coding\C#\CornyFlakezPlugin\CornyFlakezPlugin\obj\Debug\CornyFlakezPlugin.csproj.CoreCompileInputs.cache
+C:\Users\USER\Documents\Coding\C#\CornyFlakezPlugin\CornyFlakezPlugin\bin\Debug\CornyFlakezPlugin.dll
+C:\Users\USER\Documents\Coding\C#\CornyFlakezPlugin\CornyFlakezPlugin\bin\Debug\CornyFlakezPlugin.pdb
+C:\Users\USER\Documents\Coding\C#\CornyFlakezPlugin\CornyFlakezPlugin\obj\Debug\CornyFlakezPlugin.dll
+C:\Users\USER\Documents\Coding\C#\CornyFlakezPlugin\CornyFlakezPlugin\obj\Debug\CornyFlakezPlugin.pdb

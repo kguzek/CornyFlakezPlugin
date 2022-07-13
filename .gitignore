@@ -1,1 +1,7 @@
+# Compiled DLL files
 bin
+# Visual Studio files
+.vs
+*.csproj
+# Developer build scripts
+*.ps1
