@@ -169,16 +169,16 @@ namespace CornyFlakezPlugin.Callouts
             Functions.SetPursuitIsActiveForPlayer(pursuit, true);
 
 
-#region Relaying suspect details via scanner
+            #region Relaying suspect details via scanner
             float heading = suspectVehicle.Heading;
             Direction dir = (Direction)(Math.Round(heading / 90) % 4);
-            string directionScannerAudio = "SUSPECT_IS DIRECTION_BOUND_";
-            if (new Random().Next(2) == 0)
-                directionScannerAudio = "SUSPECT_HEADING DIRECTION_HEADING_";
+            string directionScannerAudio = (new Random().Next(2) == 0)
+              ? "SUSPECT_HEADING DIRECTION_HEADING_"
+              : "SUSPECT_IS DIRECTION_BOUND_";
 
             Functions
                 .PlayScannerAudio($"{directionScannerAudio}{dir} IN_A {GetVehicleDescription(suspectVehicle)} UNITS_RESPOND_CODE_03");
-#endregion
+            #endregion
 
 
             Functions

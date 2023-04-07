@@ -20,15 +20,14 @@ namespace CornyFlakezPlugin2
         }
         public static CalloutDebugInfo currentDebugInfo = new CalloutDebugInfo();
 
-        private static readonly Version version = Assembly.GetExecutingAssembly().GetName().Version;
-        private const string pluginName = "CornyFlakezPlugin2";
+        private static readonly Version VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+        private const string PLUGIN_NAME = "CornyFlakezPlugin2";
 
         private static void CreateMainMenu()
         {
-
             #region Menu Population 
             #region Main Menu
-            UIMenu mainMenu = new UIMenu(pluginName, $"~b~{pluginName} version ~g~{version}");
+            UIMenu mainMenu = new UIMenu(PLUGIN_NAME, $"~b~{PLUGIN_NAME} version ~g~{VERSION}");
             var spawnMenuButton = new UIMenuItem("Spawning", "Options for spawning peds and vehicles.");
             var pedMenuButton = new UIMenuItem("Ped actions", "Options for making peds do stuff.");
             var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
@@ -42,7 +41,7 @@ namespace CornyFlakezPlugin2
                 reloadButton);
             #endregion
             #region Spawning Menu
-            UIMenu spawnMenu = new UIMenu(pluginName, "~b~PED AND VEHICLE SPAWNING");
+            UIMenu spawnMenu = new UIMenu(PLUGIN_NAME, "~b~PED AND VEHICLE SPAWNING");
             Model[] pedModels = new Model[]
             {
                 "s_m_y_cop_01",
@@ -79,7 +78,7 @@ namespace CornyFlakezPlugin2
                 vehModelSelector);
             #endregion
             #region Ped Menu
-            UIMenu pedMenu = new UIMenu(pluginName, "~b~PED ACTIONS");
+            UIMenu pedMenu = new UIMenu(PLUGIN_NAME, "~b~PED ACTIONS");
             var pedSelector = new UIMenuNumericScrollerItem<int>("Selected ped", "", 1, 1, 1);
             var selectedPedModel = new UIMenuItem("No spawned peds.", "The currently selected ped's model name.")
             {
@@ -109,7 +108,7 @@ namespace CornyFlakezPlugin2
                 followMeSelector);
             #endregion
             #region Vehicle Menu
-            UIMenu vehMenu = new UIMenu(pluginName, "~b~VEHICLE ACTIONS");
+            UIMenu vehMenu = new UIMenu(PLUGIN_NAME, "~b~VEHICLE ACTIONS");
             var vehSelector = new UIMenuNumericScrollerItem<int>("Selected vehicle", "", 1, 1, 1);
             var selectedVehModel = new UIMenuItem("No spawned vehicle.", "The spawned vehicle's model name.")
             {
@@ -260,10 +259,11 @@ namespace CornyFlakezPlugin2
             {
                 bool pedsHaveBeenSpawned = Functions.peds.Count != 0;
                 bool carsHaveBeenSpawned = Functions.vehicles.Count != 0;
+                bool pedsAndCarsHaveBeenSpawned = pedsHaveBeenSpawned && carsHaveBeenSpawned;
                 pedSelector.Enabled = pedsHaveBeenSpawned;
-                goToVehSelector.Enabled = pedsHaveBeenSpawned && carsHaveBeenSpawned;
-                enterVehSelector.Enabled = pedsHaveBeenSpawned && carsHaveBeenSpawned;
-                enterVehCheckbox.Enabled = pedsHaveBeenSpawned && carsHaveBeenSpawned;
+                goToVehSelector.Enabled = pedsAndCarsHaveBeenSpawned;
+                enterVehSelector.Enabled = pedsAndCarsHaveBeenSpawned;
+                enterVehCheckbox.Enabled = pedsAndCarsHaveBeenSpawned;
                 bool pedIsBusy = pedsHaveBeenSpawned ? Functions.peds[pedSelector.Value - 1].Tasks.CurrentTaskStatus != TaskStatus.InProgress : false;
                 driveAwaySelector.Enabled = pedIsBusy && carsHaveBeenSpawned;
                 goToVehSelector.Maximum = vehSelector.Maximum = 
@@ -327,14 +327,14 @@ namespace CornyFlakezPlugin2
         {
             #region Menu Population
             #region Debug Main Menu
-            UIMenu debugMenu = new UIMenu(pluginName, "~b~DEBUGGING MENU");
+            UIMenu debugMenu = new UIMenu(PLUGIN_NAME, "~b~DEBUGGING MENU");
             UIMenuItem debugPeds = new UIMenuItem("Peds");
             UIMenuItem debugVehs = new UIMenuItem("Vehicles");
             debugMenu.AddItems(debugPeds, debugVehs);
             #endregion
 
             #region Ped Debugging Menu
-            UIMenu pedDebuggingMenu = new UIMenu(pluginName, "~b~PED DEBUGGING");
+            UIMenu pedDebuggingMenu = new UIMenu(PLUGIN_NAME, "~b~PED DEBUGGING");
             var pedSelector = new UIMenuNumericScrollerItem<int>("Selected ped", "", 1, 1, 1);
             var pedModelName = new UIMenuItem("Model name");
             var pedExists = new UIMenuItem("Exist status");
@@ -343,7 +343,7 @@ namespace CornyFlakezPlugin2
             #endregion
 
             #region Vehicle Debugging Menu
-            UIMenu vehDebuggingMenu = new UIMenu(pluginName, "~b~VEHICLE DEBUGGING");
+            UIMenu vehDebuggingMenu = new UIMenu(PLUGIN_NAME, "~b~VEHICLE DEBUGGING");
             var vehSelector = new UIMenuNumericScrollerItem<int>("Selected vehicle", "", 1, 1, 1);
             var vehModelName = new UIMenuItem("Model name");
             var vehExists = new UIMenuItem("Exist status");

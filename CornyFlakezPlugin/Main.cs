@@ -15,8 +15,8 @@ using System.Xml;
 
 public class Main : Plugin
 {
-    private const string pluginName = "CornyFlakezPlugin";
-    private static readonly Version version = Assembly.GetExecutingAssembly().GetName().Version;
+    private const string PLUGIN_NAME = "CornyFlakezPlugin";
+    private static readonly Version VERSION = Assembly.GetExecutingAssembly().GetName().Version;
     private static readonly List<Type> calloutTypes = new List<Type> { 
         typeof(VehiclePursuit), 
         typeof(PoliceEscort) };
@@ -26,7 +26,7 @@ public class Main : Plugin
         Functions.OnOnDutyStateChanged += OnOnDutyStateChangedHandler;
         Game.LogTrivial("");
         Game.LogTrivial("==================================================================================");
-        Game.LogTrivial($"{pluginName} {version} has been initialised.");
+        Game.LogTrivial($"{PLUGIN_NAME} {VERSION} has been initialised.");
         Game.LogTrivial("==================================================================================");
         Game.LogTrivial("");
         DataManagement.rootDirectory = Environment.CurrentDirectory;
@@ -37,7 +37,7 @@ public class Main : Plugin
 
     public override void Finally()
     {
-        Game.LogTrivial($"{pluginName} has been cleaned up.");
+        Game.LogTrivial($"{PLUGIN_NAME} has been cleaned up.");
     }
     
     private static void OnOnDutyStateChangedHandler(bool OnDuty)
@@ -46,7 +46,7 @@ public class Main : Plugin
         {
             GiveLoadout("OnDuty");
             RegisterCallouts();
-            Game.DisplayNotification($"{pluginName} {version} has loaded successfully.");
+            Game.DisplayNotification($"{PLUGIN_NAME} {VERSION} has loaded successfully.");
         }
         else
         {
@@ -59,7 +59,7 @@ public class Main : Plugin
         Game.LogTrivial("");
         Game.LogTrivial("==================================================================================");
         calloutTypes.ForEach(callout => Functions.RegisterCallout(callout));
-        Game.LogTrivial($"Successfully registered all {pluginName} callouts.");
+        Game.LogTrivial($"Successfully registered all {PLUGIN_NAME} callouts.");
         Game.LogTrivial("==================================================================================");
         Game.LogTrivial("");
     }
@@ -71,7 +71,7 @@ public class Main : Plugin
         {
             Game.LogTrivial("");
             Game.LogTrivial("==================================================================================");
-            Game.LogTrivial($"{pluginName}: equipping loadout {loadoutName}...");
+            Game.LogTrivial($"{PLUGIN_NAME}: equipping loadout {loadoutName}...");
             XmlNode loadoutNode = xmlDocument.SelectSingleNode($"//WeaponLoadouts/{loadoutName}");
             if (loadoutNode.ChildNodes.Count > 0)
             {
@@ -132,7 +132,7 @@ public class Main : Plugin
         }
         Game.LogTrivial("");
         Game.LogTrivial("==================================================================================");
-        Game.LogTrivial($"{pluginName}: Could not resolve assembly '{missingAssemblyName}'.");
+        Game.LogTrivial($"{PLUGIN_NAME}: Could not resolve assembly '{missingAssemblyName}'.");
         Game.LogTrivial("==================================================================================");
         Game.LogTrivial("");
         return null;
@@ -419,9 +419,13 @@ public class Main : Plugin
             UnitType unitType = callsign.Item2;
             int beat = callsign.Item3;
             string callsignAudioName = $"DIV_{division:D2} {unitType} BEAT_{beat:D2}";
-            string[] presetCallsigns = Directory.GetFiles(@"LSPDFR\audio\scanner\CAR_CODE_COMPOSITE");
-            if (presetCallsigns.Any(c => c.Contains($"{division:D2}_{unitType}_{beat:D2}")))
-                callsignAudioName = $"{division:D2}_{unitType}_{beat:D2}";
+            try
+            {
+              string[] presetCallsigns = Directory.GetFiles(@"LSPDFR\audio\scanner\CAR_CODE_COMPOSITE");
+              if (presetCallsigns.Any(c => c.Contains($"{division:D2}_{unitType}_{beat:D2}")))
+                  callsignAudioName = $"{division:D2}_{unitType}_{beat:D2}";
+            }
+            catch {}
             return callsignAudioName;
         }
 
@@ -559,7 +563,7 @@ public class Main : Plugin
             }
             Functions.PlayScannerAudio($"{audioMsg}");
             Game.DisplayHelp($"{callingCallout.FriendlyName} is {codeMsg}~w~.", 4000);
-            if (IsLSPDFRPluginRunning($"{pluginName}2.dll"))
+            if (IsLSPDFRPluginRunning($"{PLUGIN_NAME}2.dll"))
                 DebugPluginFunctions.PassDebugInfo();
         }
     }
