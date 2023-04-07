@@ -1,6 +1,7 @@
 # Compiled DLL files
 bin
 obj
+References
 # Visual Studio files
 .vs
 *.csproj
