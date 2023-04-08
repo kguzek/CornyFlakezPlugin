@@ -16,7 +16,15 @@ using System.Xml;
 public class Main : Plugin
 {
     private const string PLUGIN_NAME = "CornyFlakezPlugin";
-    private static readonly Version VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+    public static string GetAssemblyVersion()
+    {
+        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+        return fvi.FileVersion;
+    }
+
+    public static readonly string VERSION = GetAssemblyVersion();
+
     private static readonly List<Type> calloutTypes = new List<Type> { 
         typeof(VehiclePursuit), 
         typeof(PoliceEscort) };
@@ -511,12 +519,9 @@ public class Main : Plugin
 
         public static void ProcessCallout(Callout callout, List<Ped> pedsToProcess = null)
         {
-            // If there is no list specified in the parameters (ie. it is null) set it to an empty list
-            // '??' evaluates if pedsToProcess is null, and if it is returns a new List<Ped>() otherwise itself
-            pedsToProcess = pedsToProcess ?? new List<Ped>();
             if (Game.IsKeyDown(System.Windows.Forms.Keys.End))
                 callout.End();
-            if (pedsToProcess.Any(ped => !ped.Exists()))
+            if (pedsToProcess?.Any(ped => !ped.Exists()) ?? false)
                 callout.End();
         }
 
