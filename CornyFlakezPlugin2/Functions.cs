@@ -4,7 +4,7 @@ using Rage;
 
 namespace CornyFlakezPlugin2
 {
-    class Functions
+    partial class Functions
     {
         public static List<KeyValuePair<Vehicle, Blip>> vehicles = new List<KeyValuePair<Vehicle, Blip>>();
         public static readonly List<Ped> peds = new List<Ped>();

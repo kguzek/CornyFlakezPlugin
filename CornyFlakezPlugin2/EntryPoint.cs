@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
 
 [assembly: Rage.Attributes.Plugin("CornyFlakezPlugin2", Description = "Test plugin for CornyFlakezPlugin.", Author = "CornyFlakez")]
 namespace CornyFlakezPlugin2
@@ -17,26 +16,28 @@ namespace CornyFlakezPlugin2
         {
             public List<Ped> peds { get; set; } = new List<Ped>();
             public List<Vehicle> vehicles { get; set; } = new List<Vehicle>();
+            public Callout activeCallout { get; set; }
         }
         public static CalloutDebugInfo currentDebugInfo = new CalloutDebugInfo();
 
-        private static readonly Version VERSION = Assembly.GetExecutingAssembly().GetName().Version;
         private const string PLUGIN_NAME = "CornyFlakezPlugin2";
 
         private static void CreateMainMenu()
         {
             #region Menu Population 
             #region Main Menu
-            UIMenu mainMenu = new UIMenu(PLUGIN_NAME, $"~b~{PLUGIN_NAME} version ~g~{VERSION}");
+            UIMenu mainMenu = new UIMenu(PLUGIN_NAME, $"~b~{PLUGIN_NAME} version ~g~{CornyFlakezPlugin2.Main.VERSION}");
             var spawnMenuButton = new UIMenuItem("Spawning", "Options for spawning peds and vehicles.");
             var pedMenuButton = new UIMenuItem("Ped actions", "Options for making peds do stuff.");
             var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
+            var calloutsMenuButton = new UIMenuItem("Callouts", "Options relating to plugin callouts.");
             var clearButton = new UIMenuItem("Dismiss peds", "Dismisses all spawned peds and deletes any spawned vehicles.");
             var reloadButton = new UIMenuItem("Reload plugin", "Reloads this plugin.");
             mainMenu.AddItems(
                 spawnMenuButton,
                 pedMenuButton,
                 vehMenuButton,
+                calloutsMenuButton,
                 clearButton,
                 reloadButton);
             #endregion
@@ -126,7 +127,7 @@ namespace CornyFlakezPlugin2
             {
                 Functions.SetVehicleBlipToggleStatus(vehSelector.Value - 1, value);
                 vehicleBlipColourSelector.Enabled = value;
-            };            
+            };
             vehMenu.AddItems(
                 vehSelector,
                 selectedVehModel,
@@ -134,19 +135,43 @@ namespace CornyFlakezPlugin2
                 toggleVehicleBlipCheckbox,
                 vehicleBlipColourSelector);
             #endregion
+            #region Callouts Menu
+            UIMenu calloutsMenu = new UIMenu(PLUGIN_NAME, "~b~CALLOUT MANAGER");
+            var calloutsList = new UIMenuListScrollerItem<Type>("Selected callout", "", CornyFlakezPlugin2.Main.calloutTypes)
+            {
+              Formatter = callout => Functions.GetCalloutName(callout),
+            };
+            var startCalloutButton = new UIMenuItem("Start callout", "Emulates starting the selected callout.");
+            var endCalloutButton = new UIMenuItem("End active callout", "Ends the callout emulation.") {
+                Enabled = false,
+            };
+            calloutsMenu.AddItems(calloutsList, startCalloutButton, endCalloutButton);
+            #endregion
             #endregion
 
-            MenuPool menuPool = new MenuPool { mainMenu, spawnMenu, pedMenu, vehMenu };
+            MenuPool menuPool = new MenuPool { mainMenu, spawnMenu, pedMenu, vehMenu, calloutsMenu };
 
-            mainMenu.OnItemSelect += ItemSelectHandler;
-            spawnMenu.OnItemSelect += ItemSelectHandler;
-            pedMenu.OnItemSelect += ItemSelectHandler;
-            vehMenu.OnItemSelect += ItemSelectHandler;
+            foreach (UIMenu menu in menuPool)
+            {
+              menu.OnItemSelect += ItemSelectHandler;
+              if (menu != mainMenu)
+              {
+                menu.OnMenuClose += OnMenuClose;
+              }
+            }
+
+            void OnMenuClose(UIMenu menu)
+            {
+                mainMenu.Visible = true;
+            }
 
             void ItemSelectHandler(UIMenu menu, UIMenuItem selectedItem, int selectedItemIndex)
             {
+                int menuIndex = menuPool.IndexOf(menu);
+                // Game.LogTrivial($"Clicked menu {selectedItem.Text} (idx {selectedItemIndex}) in {menu.TitleText} (idx {menuIndex})");
+              
                 updateMenuItems();
-                switch (menuPool.IndexOf(menu))
+                switch (menuIndex)
                 {
                     case 0: // Main menu
                         switch (selectedItemIndex)
@@ -163,10 +188,14 @@ namespace CornyFlakezPlugin2
                                 mainMenu.Visible = false;
                                 vehMenu.Visible = true;
                                 break;
-                            case 3: // Dismiss button
+                            case 3: // Callouts menu button
+                                mainMenu.Visible = false;
+                                calloutsMenu.Visible = true;
+                                break;
+                            case 4: // Dismiss button
                                 Functions.ClearPedsAndVehicles();
                                 break;
-                            case 4: // Reload plugin button
+                            case 5: // Reload plugin button
                                 Functions.ClearPedsAndVehicles();
                                 mainMenu.Visible = false;
                                 Game.ReloadActivePlugin();
@@ -243,17 +272,29 @@ namespace CornyFlakezPlugin2
                                 break;
                         }
                         break;
+                    case 4: // Callouts menu
+                        switch (selectedItemIndex)
+                        {
+                            case 1: // Start callout button
+                                startCalloutButton.Enabled = false;
+                                endCalloutButton.Enabled = true;
+                                object callout = System.Activator.CreateInstance(calloutsList.SelectedItem);
+                                currentDebugInfo.activeCallout = (Callout) callout;
+                                currentDebugInfo.activeCallout.OnBeforeCalloutDisplayed();
+                                currentDebugInfo.activeCallout.OnCalloutAccepted();
+                                break;
+                            case 2: // End callout button
+                                endCalloutButton.Enabled = false;
+                                startCalloutButton.Enabled = true;
+                                currentDebugInfo.activeCallout.End();
+                                currentDebugInfo.activeCallout = null;
+                                break;
+                        }
+                        break;
                 }
             }
 
-            spawnMenu.OnMenuClose += OnMenuClose;
-            pedMenu.OnMenuClose += OnMenuClose;
-            vehMenu.OnMenuClose += OnMenuClose;
 
-            void OnMenuClose(UIMenu menu)
-            {
-                mainMenu.Visible = true;
-            }
 
             void updateMenuItems()
             {
@@ -293,6 +334,14 @@ namespace CornyFlakezPlugin2
                     {
                         mainMenu.Visible = !(mainMenu.Visible || UIMenu.IsAnyMenuVisible || TabView.IsAnyPauseMenuVisible);
                         updateMenuItems();
+                    }
+                    if (currentDebugInfo.activeCallout != null)
+                    {
+                        currentDebugInfo.activeCallout.Process();
+                        if (Game.IsKeyDown(System.Windows.Forms.Keys.End))
+                        {
+                            currentDebugInfo.activeCallout = null;
+                        }
                     }
                     for (int i = 0; i < Functions.vehicles.Count; i++)
                     {
