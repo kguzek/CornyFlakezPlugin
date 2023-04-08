@@ -30,7 +30,7 @@ namespace CornyFlakezPlugin2
             var spawnMenuButton = new UIMenuItem("Spawning", "Options for spawning peds and vehicles.");
             var pedMenuButton = new UIMenuItem("Ped actions", "Options for making peds do stuff.");
             var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
-            var calloutsMenuButton = new UIMenuItem("Callouts", "Options relating to plugin callouts.");
+            var calloutsMenuButton = new UIMenuItem("Callout emulator", "Options relating to emulating LSPDFR callouts.");
             var clearButton = new UIMenuItem("Dismiss peds", "Dismisses all spawned peds and deletes any spawned vehicles.");
             var reloadButton = new UIMenuItem("Reload plugin", "Reloads this plugin.");
             mainMenu.AddItems(
@@ -136,7 +136,7 @@ namespace CornyFlakezPlugin2
                 vehicleBlipColourSelector);
             #endregion
             #region Callouts Menu
-            UIMenu calloutsMenu = new UIMenu(PLUGIN_NAME, "~b~CALLOUT MANAGER");
+            UIMenu calloutsMenu = new UIMenu(PLUGIN_NAME, "~b~CALLOUT EMULATOR");
             var calloutsList = new UIMenuListScrollerItem<Type>("Selected callout", "", CornyFlakezPlugin2.Main.calloutTypes)
             {
               Formatter = callout => Functions.GetCalloutName(callout),
@@ -287,7 +287,6 @@ namespace CornyFlakezPlugin2
                                 endCalloutButton.Enabled = false;
                                 startCalloutButton.Enabled = true;
                                 currentDebugInfo.activeCallout.End();
-                                currentDebugInfo.activeCallout = null;
                                 break;
                         }
                         break;
@@ -340,7 +339,7 @@ namespace CornyFlakezPlugin2
                         currentDebugInfo.activeCallout.Process();
                         if (Game.IsKeyDown(System.Windows.Forms.Keys.End))
                         {
-                            currentDebugInfo.activeCallout = null;
+                            endCalloutButton.Activate(calloutsMenu);
                         }
                     }
                     for (int i = 0; i < Functions.vehicles.Count; i++)

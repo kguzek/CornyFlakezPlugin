@@ -445,9 +445,16 @@ namespace CornyFlakezPlugin2
             public static void ProcessCallout(Callout callout, List<Ped> pedsToProcess = null)
             {
                 if (Game.IsKeyDown(System.Windows.Forms.Keys.End))
-                    callout.End();
-                if (pedsToProcess?.Any(ped => !ped.Exists()) ?? false)
-                    callout.End();
+                {
+                  callout.End();
+                }
+                if (pedsToProcess == null) return;
+                foreach (Ped ped in pedsToProcess) {
+                  if (ped.Exists() && ped.IsAlive) continue;
+                  callout.End();
+                  Game.LogTrivial($"Aborting callout: {ped.Model.Name} is missing.");
+                  break;
+                }
             }
 
             [Flags]
