@@ -30,7 +30,7 @@ namespace CornyFlakezPlugin.Callouts
             new CalloutLocation()
             {
               suvSpawnPoint = new Vector3(259, -378, 44f),
-              copSpawnPoint = new Vector3(252.6f, -376.8f, 44),
+              copSpawnPoint = new Vector3(253f, -376f, 44),
               bdgSpawnPoint = new Vector3(236, -412, 48.2f),
               vipSpawnPoint = new Vector3(235, -410, 48.2f),
               partialDestination = new Vector3(300, -450, 44f)
@@ -42,6 +42,7 @@ namespace CornyFlakezPlugin.Callouts
     private readonly Vector3
         jetSpawnPoint = new Vector3(-1000, -3000, 14.6f);
 
+    private readonly Vector3 airportGateLocation = new Vector3(-968, -2797, 14f);
     private readonly Vector3 destination = new Vector3(-1003, -2987, 14f);
 
     private readonly Vector3
@@ -49,6 +50,12 @@ namespace CornyFlakezPlugin.Callouts
 
     private readonly Vector3
         jetTakeOffPoint = new Vector3(-1350, -2240, 14.1f);
+
+    private VehicleDrivingFlags escortDrivingFlags =
+        VehicleDrivingFlags.Emergency |
+        VehicleDrivingFlags.StopAtDestination;
+
+    private VehicleDrivingFlags normalDrivingFlags = VehicleDrivingFlags.Normal | VehicleDrivingFlags.StopAtDestination;
 
     private Ped driverPed;
 
@@ -70,8 +77,6 @@ namespace CornyFlakezPlugin.Callouts
 
     private Blip vipBlip;
 
-    private Blip copBlip;
-
     private CalloutLocation calloutLocation;
 
     private enum CalloutStage
@@ -80,11 +85,11 @@ namespace CornyFlakezPlugin.Callouts
       PreArrival,
       WaitingForDoor,
       WaitingForVIP,
-      WaitingForBodyguard,
       EnteringVehicleVIP,
       EnteringVehicleBodyguard,
       EscortBeginning,
       Escort,
+      EscortEnd,
       ArrivedAtDestination,
       ExitingVehicleVIP,
       ApproachingPlaneVIP,
@@ -97,26 +102,27 @@ namespace CornyFlakezPlugin.Callouts
 
     private void CleanUpAfterCallout()
     {
-      foreach (Blip
-          blip
-          in
-          new Blip[] { missionBlip, vipBlip, copBlip }
-              .Where(b => b.Exists())
-      )
+      var blipsToDelete = new Blip[] { missionBlip, vipBlip }
+        .Where(b => b.Exists());
+      foreach (Blip blip in blipsToDelete)
         blip.Delete();
 
       if (stage == CalloutStage.TakeOff)
       {
         jet.Dismiss();
+        Game.LogTrivial("Jet has been dismissed");
       }
       else if (jet.Exists())
       {
         jet.Delete();
+        Game.LogTrivial("Jet has been deleted");
       }
       stage = CalloutStage.None;
-      suv.Dismiss();
-      copCar.IsSirenOn = false;
-      copCar.Dismiss();
+      if (copCar.Exists()) 
+      {
+        copCar.IsSirenOn = false;
+        copCar.Dismiss();
+      }
       foreach (Ped p in peds)
       {
         if (p.Exists())
@@ -268,135 +274,119 @@ namespace CornyFlakezPlugin.Callouts
               40f
           )
           {
-            stage = CalloutStage.WaitingForVIP;
             if (missionBlip.Exists()) missionBlip.Delete();
-            Game
-                .DisplaySubtitle("Park up and wait for the ~b~VIP~w~ to enter the SUV.");
+            Game.DisplaySubtitle("Park up and wait for the ~b~VIP~w~ to enter the SUV.");
             vipBlip = vipPed.AttachBlip();
-            vipBlip.Color = Color.SkyBlue;
+            vipBlip.Scale = 0.5f;
             vipBlip.Name = "VIP";
-            copBlip = copCar.AttachBlip();
-            copBlip.Color = Color.SkyBlue;
-            copBlip.Name = "Cop";
+            vipBlip.Color = Color.FromKnownColor(KnownColor.MenuHighlight);
 
             // bodyguardPed.Tasks.EnterVehicle(suv, 3000, 2, EnterVehicleFlags.DoNotEnter);
             bodyguardPed
                 .Tasks
-                .GoToOffsetFromEntity(suv, 1.5f, 260f, 1f);
+                .GoToOffsetFromEntity(suv, 2f, 240f, 1f);
 
             // bodyguardPed.Tasks.GoStraightToPosition(suv.RightPosition, 1f, suv.Heading - 180f, 3f, 30000);
             vipPed
                 .Tasks
                 .FollowToOffsetFromEntity(bodyguardPed,
                 new Vector3(1f, 1f, 0f));
+            stage = CalloutStage.WaitingForVIP;
           }
           break;
         case CalloutStage.WaitingForVIP:
-          if (bodyguardPed.DistanceTo(suv) < 2f)
+          if (bodyguardPed.DistanceTo(suv) < 3f)
           {
-            stage = CalloutStage.WaitingForDoor;
             bodyguardPed.Tasks.Clear();
             vipPed.Tasks.Clear();
             bodyguardPed
                 .Tasks
                 .EnterVehicle(suv,
-                3000,
+                5000,
                 2,
                 EnterVehicleFlags.DoNotEnter);
+            stage = CalloutStage.WaitingForDoor;
           }
           break;
         case CalloutStage.WaitingForDoor:
-          if (suv.GetDoors()[1].IsOpen)
+          if (bodyguardPed.Tasks.CurrentTaskStatus == TaskStatus.NoTask)
           {
-            stage = CalloutStage.WaitingForBodyguard;
+            vipPed.Tasks.EnterVehicle(suv, 10000, 2);
             bodyguardPed
-                .Tasks
-                .GoToOffsetFromEntity(suv, 2.2f, 260f, 1f);
-            vipPed.Tasks.EnterVehicle(suv, 3000, 2);
+              .Tasks
+              .GoToOffsetFromEntity(suv, 3f, 230f, 1f);
             stage = CalloutStage.EnteringVehicleVIP;
           }
-          break;
-        case CalloutStage.WaitingForBodyguard:
-          // if (
-          //     bodyguardPed.Tasks.CurrentTaskStatus !=
-          //     TaskStatus.InProgress
-          // )
-          // {
-          //     stage = CalloutStage.EnteringVehicleVIP;
-          //     vipPed.Tasks.EnterVehicle(suv, 3000, 2);
-          // }
           break;
         case CalloutStage.EnteringVehicleVIP:
           if (vipPed.IsInVehicle(suv, false))
           {
-            stage = CalloutStage.EnteringVehicleBodyguard;
             bodyguardPed.Tasks.EnterVehicle(suv, 0);
+            suv.Doors[3].Close(false);
+            stage = CalloutStage.EnteringVehicleBodyguard;
           }
           break;
         case CalloutStage.EnteringVehicleBodyguard:
           if (bodyguardPed.IsInVehicle(suv, false))
           {
-            stage = CalloutStage.EscortBeginning;
-            Game
-                .DisplaySubtitle("Escort the ~b~VIP~w~ to the ~y~airport~w~.");
-            missionBlip = jet.AttachBlip();
+            Game.DisplaySubtitle("Escort the ~b~VIP~w~ to the ~y~airport~w~.");
+            missionBlip = new Blip(airportGateLocation);
             missionBlip.Color = Color.Yellow;
             missionBlip.Name = "LSIA";
             missionBlip.EnableRoute(Color.Yellow);
-            suv.Doors[3].Close(false);
+            vipBlip.Scale = 1f;
             copCar.IsSirenSilent = false;
-            VehicleDrivingFlags flags =
-                VehicleDrivingFlags.Emergency |
-                VehicleDrivingFlags.FollowTraffic |
-                VehicleDrivingFlags.StopAtDestination;
             driverPed
                 .Tasks
                 .DriveToPosition(suv,
                 calloutLocation.partialDestination,
                 40f,
-                flags,
+                escortDrivingFlags,
                 5f);
             Main
                 .CalloutCommons
                 .MakePedFollowTarget(copCar.Driver,
                 vipPed,
                 5f,
-                flags);
+                escortDrivingFlags);
+            stage = CalloutStage.EscortBeginning;
           }
           break;
         case CalloutStage.EscortBeginning:
-          if (suv.DistanceTo(calloutLocation.partialDestination) < 20f
-          )
+          if (suv.DistanceTo(calloutLocation.partialDestination) < 20f)
           {
             stage = CalloutStage.Escort;
-            VehicleDrivingFlags flags =
-                VehicleDrivingFlags.Emergency |
-                VehicleDrivingFlags.FollowTraffic |
-                VehicleDrivingFlags.StopAtDestination;
             driverPed
                 .Tasks
-                .DriveToPosition(suv, destination, 40f, flags, 5f);
+                .DriveToPosition(suv, airportGateLocation, 40f, escortDrivingFlags, 10f);
           }
           break;
         case CalloutStage.Escort:
-          if (suv.DistanceTo(destination) < 6f)
+          if (suv.DistanceTo(airportGateLocation) < 15f)
           {
-            stage = CalloutStage.ArrivedAtDestination;
-            if (missionBlip.Exists()) missionBlip.Delete();
-            Game
-                .DisplaySubtitle("Wait for the ~b~VIP~w~ to board the plane.");
-            bodyguardPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
-          }
-          else if (suv.DistanceTo(destination) < 50f)
-          {
+            Game.DisplaySubtitle("Escort the ~b~VIP~w~ to the ~y~Jet Charter~w~.");
+            missionBlip = new Blip(destination, 20f);
+            missionBlip.Name = "Hangar";
+            missionBlip.Color = Color.Yellow;
+            driverPed.Tasks.DriveToPosition(suv, destination, 25f, normalDrivingFlags, 5f);
             Main.CalloutCommons.StopPedFollowing(copCar.Driver);
             copCar
-                .Driver
-                .Tasks
-                .DriveToPosition(copDestination,
-                20f,
-                VehicleDrivingFlags.Normal);
+              .Driver
+              .Tasks
+              .DriveToPosition(copDestination,
+              20f,
+              normalDrivingFlags);
             if (!copCar.IsSirenSilent) copCar.IsSirenSilent = true;
+            stage = CalloutStage.EscortEnd;
+          }
+          break;
+        case CalloutStage.EscortEnd:
+          if (suv.DistanceTo(destination) < 6f)
+          {
+            if (missionBlip.Exists()) missionBlip.Delete();
+            Game.DisplaySubtitle("Wait for the ~b~VIP~w~ to board the plane.");
+            bodyguardPed.Tasks.LeaveVehicle(LeaveVehicleFlags.None);
+            stage = CalloutStage.ArrivedAtDestination;
           }
           break;
         case CalloutStage.ArrivedAtDestination:
@@ -415,7 +405,7 @@ namespace CornyFlakezPlugin.Callouts
             bodyguardPed
                 .Tasks
                 .EnterVehicle(suv,
-                3000,
+                5000,
                 2,
                 EnterVehicleFlags.DoNotEnter);
           }
@@ -423,19 +413,18 @@ namespace CornyFlakezPlugin.Callouts
         case CalloutStage.ExitingVehicleVIP:
           if (!vipPed.IsInVehicle(suv, true))
           {
-            if (jet.Exists() && jet.IsAlive)
+            if (!jet.Exists() || !jet.IsAlive)
             {
-              stage = CalloutStage.ApproachingPlaneVIP;
-              bodyguardPed
-                  .Tasks
-                  .FollowToOffsetFromEntity(vipPed,
-                  new Vector3(1f, 1f, 0f));
-              vipPed.Tasks.GoToOffsetFromEntity(jet, 5f, 30f, 1f);
+                End();
+                break;
             }
-            else
-            {
-              End();
-            }
+            
+            stage = CalloutStage.ApproachingPlaneVIP;
+            bodyguardPed
+                .Tasks
+                .FollowToOffsetFromEntity(vipPed,
+                new Vector3(1f, 1f, 0f));
+            vipPed.Tasks.GoToOffsetFromEntity(jet, 5f, 30f, 1f);
           }
           break;
         case CalloutStage.ApproachingPlaneVIP:
@@ -443,6 +432,7 @@ namespace CornyFlakezPlugin.Callouts
           {
             stage = CalloutStage.BoardingPlaneVIP;
             vipPed.Tasks.EnterVehicle(jet, -2);
+            driverPed.Dismiss();
           }
           break;
         case CalloutStage.BoardingPlaneVIP:
@@ -452,9 +442,9 @@ namespace CornyFlakezPlugin.Callouts
             GameFiber
                 .StartNew(delegate ()
                 {
-                  GameFiber.Sleep(1500);
+                  GameFiber.Sleep(1000);
                   stage = CalloutStage.BoardingPlaneBodyguard;
-                  vipPed.WarpIntoVehicle(jet, 3);
+                  vipPed.WarpIntoVehicle(jet, 2);
                   bodyguardPed.Tasks.EnterVehicle(jet, -2);
                 });
           }
@@ -472,16 +462,18 @@ namespace CornyFlakezPlugin.Callouts
                   jet.Doors[0].Close(false);
                   jet.IsEngineStarting = true;
                   GameFiber
-                                  .StartNew(delegate ()
-                                  {
-                                    GameFiber.Sleep(5000); // ms
-                                    pilotPed
-                                                    .Tasks
-                                                    .DriveToPosition(jetTakeOffPoint,
-                                                    10f,
-                                                    VehicleDrivingFlags.Normal,
-                                                    10f);
-                                  });
+                    .StartNew(delegate ()
+                    {
+                      GameFiber.Sleep(3000); // ms
+                      if (!pilotPed.Exists()) return;
+                      // pilotPed
+                      //   .Tasks
+                      //   .DriveToPosition(jet, jetTakeOffPoint,
+                      //   10f,
+                      //   VehicleDrivingFlags.Normal,
+                      //   10f);
+                      pilotPed.Dismiss();
+                    });
                   End();
                 });
           }
@@ -501,8 +493,8 @@ namespace CornyFlakezPlugin.Callouts
     {
       CleanUpAfterCallout();
       Main
-          .CalloutCommons
-          .EndCallout(this, Main.CalloutCommons.Code.Complete);
+        .CalloutCommons
+        .EndCallout(this, Main.CalloutCommons.Code.Complete);
       base.End();
     }
 
@@ -521,7 +513,16 @@ namespace CornyFlakezPlugin.Callouts
               playerEntity == playerPed ? 160f : 250f;
           break;
         case CalloutStage.EscortBeginning:
+          playerEntity.Position = World.GetNextPositionOnStreet(calloutLocation.partialDestination);
+          suv.Position = World.GetNextPositionOnStreet(playerEntity.RearPosition);
+          copCar.Position = World.GetNextPositionOnStreet(suv.RearPosition);
+          break;
         case CalloutStage.Escort:
+          playerEntity.Position = World.GetNextPositionOnStreet(airportGateLocation);
+          suv.Position = World.GetNextPositionOnStreet(playerEntity.RearPosition);
+          copCar.Position = World.GetNextPositionOnStreet(suv.RearPosition);
+          break;
+        case CalloutStage.EscortEnd:
           suv.Position = destination;
           suv.Heading = 215f;
           copCar.Position = copDestination;

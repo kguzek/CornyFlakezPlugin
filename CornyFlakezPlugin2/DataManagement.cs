@@ -11,7 +11,7 @@ namespace CornyFlakezPlugin2
 {
     public static class DataManagement
     {
-        public static string rootDirectory = @"C:\\Program Files\Rockstar Games\Grand Theft Auto V";
+        public static string rootDirectory = @"C:\Program Files\Rockstar Games\Grand Theft Auto V";
         private const string dataFileFolder = @"\Plugins\LSPDFR\CornyFlakezPlugin\";
 
         public static XmlDocument GetAgencySettings()
