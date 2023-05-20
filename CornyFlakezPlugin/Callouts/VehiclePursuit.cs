@@ -6,7 +6,7 @@ using LSPD_First_Response.Mod.API;
 using LSPD_First_Response.Mod.Callouts;
 using Rage;
 
-using static Main.CalloutCommons;
+using static CornyFlakezPlugin.CalloutCommons;
 
 namespace CornyFlakezPlugin.Callouts
 {
@@ -212,9 +212,7 @@ namespace CornyFlakezPlugin.Callouts
 
         public override void Process()
         {
-            Main
-                .CalloutCommons
-                .ProcessCallout(this, new List<Ped> { suspectPed });
+            ProcessCallout(this, new List<Ped> { suspectPed });
             if (!Functions.IsPursuitStillRunning(pursuit)) End();
             base.Process();
         }

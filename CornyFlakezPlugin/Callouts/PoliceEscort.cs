@@ -6,6 +6,7 @@ using LSPD_First_Response;
 using LSPD_First_Response.Mod.API;
 using LSPD_First_Response.Mod.Callouts;
 using Rage;
+using static CornyFlakezPlugin.CalloutCommons;
 
 namespace CornyFlakezPlugin.Callouts
 {
@@ -118,7 +119,7 @@ namespace CornyFlakezPlugin.Callouts
         Game.LogTrivial("Jet has been deleted");
       }
       stage = CalloutStage.None;
-      if (copCar.Exists()) 
+      if (copCar.Exists())
       {
         copCar.IsSirenOn = false;
         copCar.Dismiss();
@@ -164,10 +165,8 @@ namespace CornyFlakezPlugin.Callouts
       driverPed.WarpIntoVehicle(suv, -1);
       peds.Add(driverPed);
 
-      Main.CalloutCommons.Loadout copLoadout =
-          Main
-              .CalloutCommons
-              .GetLoadoutFromZone(EBackupUnitType.LocalUnit,
+      Loadout copLoadout =
+          GetLoadoutFromZone(EBackupUnitType.LocalUnit,
               "LosSantosCity",
               true);
       copCar =
@@ -190,7 +189,7 @@ namespace CornyFlakezPlugin.Callouts
       CalloutMessage = "Police escort requested for VIP.";
       CalloutPosition = calloutLocation.suvSpawnPoint;
 
-      string callsignAudio = Main.CalloutCommons.GetCallsignAudio();
+      string callsignAudio = GetCallsignAudio();
       Functions
           .PlayScannerAudioUsingPosition($"ATTENTION_UNIT_SPECIFIC {callsignAudio} REQUESTING_ESCORT IN_OR_ON_POSITION",
           calloutLocation.suvSpawnPoint);
@@ -246,9 +245,7 @@ namespace CornyFlakezPlugin.Callouts
       jet.Doors[0].Open(false);
       pilotPed.WarpIntoVehicle(jet, -1);
       if (
-          Main
-              .CalloutCommons
-              .IsLSPDFRPluginRunning("CornyFlakezPlugin2.dll")
+          IsLSPDFRPluginRunning("CornyFlakezPlugin2.dll")
       )
         DebugPluginFunctions
             .PassDebugInfo(peds,
@@ -343,9 +340,7 @@ namespace CornyFlakezPlugin.Callouts
                 40f,
                 escortDrivingFlags,
                 5f);
-            Main
-                .CalloutCommons
-                .MakePedFollowTarget(copCar.Driver,
+            MakePedFollowTarget(copCar.Driver,
                 vipPed,
                 5f,
                 escortDrivingFlags);
@@ -369,7 +364,7 @@ namespace CornyFlakezPlugin.Callouts
             missionBlip.Name = "Hangar";
             missionBlip.Color = Color.Yellow;
             driverPed.Tasks.DriveToPosition(suv, destination, 25f, normalDrivingFlags, 5f);
-            Main.CalloutCommons.StopPedFollowing(copCar.Driver);
+            StopPedFollowing(copCar.Driver);
             copCar
               .Driver
               .Tasks
@@ -415,10 +410,10 @@ namespace CornyFlakezPlugin.Callouts
           {
             if (!jet.Exists() || !jet.IsAlive)
             {
-                End();
-                break;
+              End();
+              break;
             }
-            
+
             stage = CalloutStage.ApproachingPlaneVIP;
             bodyguardPed
                 .Tasks
@@ -479,7 +474,7 @@ namespace CornyFlakezPlugin.Callouts
           }
           break;
       }
-      Main.CalloutCommons.ProcessCallout(this, peds);
+      ProcessCallout(this, peds);
       if (Game.IsKeyDown(System.Windows.Forms.Keys.PageDown))
         ProgressCalloutByCheating();
       if (vipPed.Exists() && !vipPed.IsAlive && vipBlip.Exists())
@@ -492,9 +487,7 @@ namespace CornyFlakezPlugin.Callouts
     public override void End()
     {
       CleanUpAfterCallout();
-      Main
-        .CalloutCommons
-        .EndCallout(this, Main.CalloutCommons.Code.Complete);
+      EndCallout(this, Code.Complete);
       base.End();
     }
 
