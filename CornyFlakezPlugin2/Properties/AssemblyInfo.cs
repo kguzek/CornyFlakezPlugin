@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("CornyFlakezPlugin2")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyCopyright("Copyright 2021-2023 © Konrad Guzek")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

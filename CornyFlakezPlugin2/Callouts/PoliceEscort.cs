@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Rage;
+using static CornyFlakezPlugin2.CalloutCommons;
 
 namespace CornyFlakezPlugin2
 {
@@ -115,7 +116,7 @@ namespace CornyFlakezPlugin2
         Game.LogTrivial("Jet has been deleted");
       }
       stage = CalloutStage.None;
-      if (copCar.Exists()) 
+      if (copCar.Exists())
       {
         copCar.IsSirenOn = false;
         copCar.Dismiss();
@@ -161,12 +162,10 @@ namespace CornyFlakezPlugin2
       driverPed.WarpIntoVehicle(suv, -1);
       peds.Add(driverPed);
 
-      Main.CalloutCommons.Loadout copLoadout =
-          Main
-              .CalloutCommons
-              .GetLoadoutFromZone(EBackupUnitType.LocalUnit,
-              "LosSantosCity",
-              true);
+      Loadout copLoadout =
+           GetLoadoutFromZone(EBackupUnitType.LocalUnit,
+               "LosSantosCity",
+               true);
       copCar =
           new Vehicle(copLoadout.VehicleInfo.Model,
               calloutLocation.copSpawnPoint,
@@ -187,7 +186,7 @@ namespace CornyFlakezPlugin2
       CalloutMessage = "Police escort requested for VIP.";
       CalloutPosition = calloutLocation.suvSpawnPoint;
 
-      string callsignAudio = Main.CalloutCommons.GetCallsignAudio();
+      string callsignAudio = GetCallsignAudio();
       Functions
           .PlayScannerAudioUsingPosition($"ATTENTION_UNIT_SPECIFIC {callsignAudio} REQUESTING_ESCORT IN_OR_ON_POSITION",
           calloutLocation.suvSpawnPoint);
@@ -242,14 +241,14 @@ namespace CornyFlakezPlugin2
           new Vehicle("LUXOR", jetSpawnPoint, 60) { IsPersistent = true };
       jet.Doors[0].Open(false);
       pilotPed.WarpIntoVehicle(jet, -1);
-    //   if (
-    //       Main
-    //           .CalloutCommons
-    //           .IsLSPDFRPluginRunning("CornyFlakezPlugin2.dll")
-    //   )
-    //     DebugPluginFunctions
-    //         .PassDebugInfo(peds,
-    //         new List<Vehicle> { suv, copCar, jet });
+      //   if (
+      //       Main
+      //           .CalloutCommons
+      //           .IsLSPDFRPluginRunning("CornyFlakezPlugin2.dll")
+      //   )
+      //     DebugPluginFunctions
+      //         .PassDebugInfo(peds,
+      //         new List<Vehicle> { suv, copCar, jet });
       return base.OnCalloutAccepted();
     }
 
@@ -340,9 +339,7 @@ namespace CornyFlakezPlugin2
                 40f,
                 escortDrivingFlags,
                 5f);
-            Main
-                .CalloutCommons
-                .MakePedFollowTarget(copCar.Driver,
+            MakePedFollowTarget(copCar.Driver,
                 vipPed,
                 5f,
                 escortDrivingFlags);
@@ -366,7 +363,7 @@ namespace CornyFlakezPlugin2
             missionBlip.Name = "Hangar";
             missionBlip.Color = Color.Yellow;
             driverPed.Tasks.DriveToPosition(suv, destination, 25f, normalDrivingFlags, 5f);
-            Main.CalloutCommons.StopPedFollowing(copCar.Driver);
+            StopPedFollowing(copCar.Driver);
             copCar
               .Driver
               .Tasks
@@ -412,10 +409,10 @@ namespace CornyFlakezPlugin2
           {
             if (!jet.Exists() || !jet.IsAlive)
             {
-                End();
-                break;
+              End();
+              break;
             }
-            
+
             stage = CalloutStage.ApproachingPlaneVIP;
             bodyguardPed
                 .Tasks
@@ -476,7 +473,7 @@ namespace CornyFlakezPlugin2
           }
           break;
       }
-      Main.CalloutCommons.ProcessCallout(this, peds);
+      ProcessCallout(this, peds);
       if (Game.IsKeyDown(System.Windows.Forms.Keys.PageDown))
         ProgressCalloutByCheating();
       if (vipPed.Exists() && !vipPed.IsAlive && vipBlip.Exists())
@@ -489,9 +486,7 @@ namespace CornyFlakezPlugin2
     public override void End()
     {
       CleanUpAfterCallout();
-      Main
-        .CalloutCommons
-        .EndCallout(this, Main.CalloutCommons.Code.Complete);
+      EndCallout(this, Code.Complete);
       base.End();
     }
 

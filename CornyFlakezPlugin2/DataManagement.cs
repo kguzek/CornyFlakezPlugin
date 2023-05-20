@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using Rage;
-using static CornyFlakezPlugin2.Main.CalloutCommons;
+using static CornyFlakezPlugin2.CalloutCommons;
 
 namespace CornyFlakezPlugin2
 {
