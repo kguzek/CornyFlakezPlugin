@@ -28,7 +28,7 @@ namespace CornyFlakezPlugin2
         
         public virtual void End()
         {
-          Main.currentDebugInfo.activeCallout = null;
+          EntryPoint.currentDebugInfo.activeCallout = null;
         }
         
         public void ShowCalloutAreaBlipBeforeAccepting(Vector3 position, float radius) {}

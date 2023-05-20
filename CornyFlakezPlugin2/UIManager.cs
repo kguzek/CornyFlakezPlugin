@@ -16,7 +16,7 @@ namespace CornyFlakezPlugin2
     {
       #region Menu Population 
       #region Main Menu
-      UIMenu mainMenu = new UIMenu(Main.PLUGIN_NAME, $"~b~{Main.PLUGIN_NAME} version ~g~{CornyFlakezPlugin2.Main.VERSION}");
+      UIMenu mainMenu = new UIMenu(EntryPoint.PLUGIN_NAME, $"~b~{EntryPoint.PLUGIN_NAME} version ~g~{CornyFlakezPlugin2.EntryPoint.VERSION}");
       var spawnMenuButton = new UIMenuItem("Spawning", "Options for spawning peds and vehicles.");
       var pedMenuButton = new UIMenuItem("Ped actions", "Options for making peds do stuff.");
       var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
@@ -32,7 +32,7 @@ namespace CornyFlakezPlugin2
           reloadButton);
       #endregion
       #region Spawning Menu
-      UIMenu spawnMenu = new UIMenu(Main.PLUGIN_NAME, "~b~PED AND VEHICLE SPAWNING");
+      UIMenu spawnMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~PED AND VEHICLE SPAWNING");
       Model[] pedModels = new Model[]
       {
                 "s_m_y_cop_01",
@@ -69,7 +69,7 @@ namespace CornyFlakezPlugin2
           vehModelSelector);
       #endregion
       #region Ped Menu
-      UIMenu pedMenu = new UIMenu(Main.PLUGIN_NAME, "~b~PED ACTIONS");
+      UIMenu pedMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~PED ACTIONS");
       var pedSelector = new UIMenuNumericScrollerItem<int>("Selected ped", "", 1, 1, 1);
       var selectedPedModel = new UIMenuItem("No spawned peds.", "The currently selected ped's model name.")
       {
@@ -99,7 +99,7 @@ namespace CornyFlakezPlugin2
           followMeSelector);
       #endregion
       #region Vehicle Menu
-      UIMenu vehMenu = new UIMenu(Main.PLUGIN_NAME, "~b~VEHICLE ACTIONS");
+      UIMenu vehMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~VEHICLE ACTIONS");
       var vehSelector = new UIMenuNumericScrollerItem<int>("Selected vehicle", "", 1, 1, 1);
       var selectedVehModel = new UIMenuItem("No spawned vehicle.", "The spawned vehicle's model name.")
       {
@@ -126,8 +126,8 @@ namespace CornyFlakezPlugin2
           vehicleBlipColourSelector);
       #endregion
       #region Callouts Menu
-      UIMenu calloutsMenu = new UIMenu(Main.PLUGIN_NAME, "~b~CALLOUT EMULATOR");
-      var calloutsList = new UIMenuListScrollerItem<Type>("Selected callout", "", CornyFlakezPlugin2.Main.calloutTypes)
+      UIMenu calloutsMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~CALLOUT EMULATOR");
+      var calloutsList = new UIMenuListScrollerItem<Type>("Selected callout", "", CornyFlakezPlugin2.EntryPoint.calloutTypes)
       {
         Formatter = callout => Functions.GetCalloutName(callout),
       };
@@ -270,14 +270,14 @@ namespace CornyFlakezPlugin2
                 startCalloutButton.Enabled = false;
                 endCalloutButton.Enabled = true;
                 object callout = System.Activator.CreateInstance(calloutsList.SelectedItem);
-                Main.currentDebugInfo.activeCallout = (Callout)callout;
-                Main.currentDebugInfo.activeCallout.OnBeforeCalloutDisplayed();
-                Main.currentDebugInfo.activeCallout.OnCalloutAccepted();
+                EntryPoint.currentDebugInfo.activeCallout = (Callout)callout;
+                EntryPoint.currentDebugInfo.activeCallout.OnBeforeCalloutDisplayed();
+                EntryPoint.currentDebugInfo.activeCallout.OnCalloutAccepted();
                 break;
               case 2: // End callout button
                 endCalloutButton.Enabled = false;
                 startCalloutButton.Enabled = true;
-                Main.currentDebugInfo.activeCallout.End();
+                EntryPoint.currentDebugInfo.activeCallout.End();
                 break;
             }
             break;
@@ -325,9 +325,9 @@ namespace CornyFlakezPlugin2
             mainMenu.Visible = !(mainMenu.Visible || UIMenu.IsAnyMenuVisible || TabView.IsAnyPauseMenuVisible);
             updateMenuItems();
           }
-          if (Main.currentDebugInfo.activeCallout != null)
+          if (EntryPoint.currentDebugInfo.activeCallout != null)
           {
-            Main.currentDebugInfo.activeCallout.Process();
+            EntryPoint.currentDebugInfo.activeCallout.Process();
             if (Game.IsKeyDown(System.Windows.Forms.Keys.End))
             {
               endCalloutButton.Activate(calloutsMenu);
@@ -366,14 +366,14 @@ namespace CornyFlakezPlugin2
     {
       #region Menu Population
       #region Debug Main Menu
-      UIMenu debugMenu = new UIMenu(Main.PLUGIN_NAME, "~b~DEBUGGING MENU");
+      UIMenu debugMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~DEBUGGING MENU");
       UIMenuItem debugPeds = new UIMenuItem("Peds");
       UIMenuItem debugVehs = new UIMenuItem("Vehicles");
       debugMenu.AddItems(debugPeds, debugVehs);
       #endregion
 
       #region Ped Debugging Menu
-      UIMenu pedDebuggingMenu = new UIMenu(Main.PLUGIN_NAME, "~b~PED DEBUGGING");
+      UIMenu pedDebuggingMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~PED DEBUGGING");
       var pedSelector = new UIMenuNumericScrollerItem<int>("Selected ped", "", 1, 1, 1);
       var pedModelName = new UIMenuItem("Model name");
       var pedExists = new UIMenuItem("Exist status");
@@ -382,7 +382,7 @@ namespace CornyFlakezPlugin2
       #endregion
 
       #region Vehicle Debugging Menu
-      UIMenu vehDebuggingMenu = new UIMenu(Main.PLUGIN_NAME, "~b~VEHICLE DEBUGGING");
+      UIMenu vehDebuggingMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~VEHICLE DEBUGGING");
       var vehSelector = new UIMenuNumericScrollerItem<int>("Selected vehicle", "", 1, 1, 1);
       var vehModelName = new UIMenuItem("Model name");
       var vehExists = new UIMenuItem("Exist status");
@@ -433,8 +433,8 @@ namespace CornyFlakezPlugin2
 
       void updateMenuItems()
       {
-        List<Ped> peds = Main.currentDebugInfo.peds;
-        List<Vehicle> vehicles = Main.currentDebugInfo.vehicles;
+        List<Ped> peds = EntryPoint.currentDebugInfo.peds;
+        List<Vehicle> vehicles = EntryPoint.currentDebugInfo.vehicles;
         void updatePedMenu()
         {
           pedSelector.Maximum = Math.Max(1, peds.Count);

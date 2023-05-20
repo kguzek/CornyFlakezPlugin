@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
- 
+
 [assembly: Rage.Attributes.Plugin("CornyFlakezPlugin2", Description = "Test plugin for CornyFlakezPlugin.", Author = "CornyFlakez")]
 namespace CornyFlakezPlugin2
 {
-  public class Main
+  public static class EntryPoint
   {
     public const string PLUGIN_NAME = "CornyFlakezPlugin";
 
@@ -104,10 +104,11 @@ namespace CornyFlakezPlugin2
       }
     }
 
-    public static void main()
+    public static void Main()
     {
       UIManager.CreateMainMenu();
       UIManager.CreateDebugMenu();
+      GameFiber.StartNew(HandleEventHandlerActions);
       GameFiber.Hibernate();
     }
   }
