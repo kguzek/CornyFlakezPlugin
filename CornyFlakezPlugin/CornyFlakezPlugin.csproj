@@ -8,6 +8,9 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="System.Windows.Forms" Version="4.0.0.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="RagePluginHookSDK">
       <HintPath>..\References\RagePluginHookSDK.dll</HintPath>
     </Reference>
@@ -17,8 +20,5 @@
     <Reference Include="CornyFlakezPlugin2">
       <HintPath>..\CornyFlakezPlugin2\bin\Debug\net48\CornyFlakezPlugin2.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Windows.Forms" Version="4.0.0.0" />
   </ItemGroup>
 </Project>
