@@ -14,7 +14,7 @@ public class Main : Plugin
   private static List<Action> EventHandlerActions = new List<Action> { };
   private static List<Action> OnDutyEventHandlerActions = new List<Action>
   {
-    //  Commandeerer.CarjackEventHandler 
+     Commandeerer.CarjackEventHandler
   };
 
   public static string GetAssemblyVersion()

@@ -31,9 +31,10 @@ namespace CornyFlakezPlugin2
     public static readonly List<Type> calloutTypes = new List<Type> {
             typeof(PoliceEscort) };
 
-    private static List<Action> EventHandlerActions = new List<Action> {
-      CornyFlakezPlugin.Commandeerer.CarjackEventHandler,
-      };
+    private static List<Action> EventHandlerActions = new List<Action>
+    {
+      Commandeerer.CarjackEventHandler,
+    };
 
     private static void HandleEventHandlerActions()
     {
