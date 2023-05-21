@@ -6,11 +6,147 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CornyFlakezPlugin2
 {
   public class UIManager
   {
+
+    private static string[] speeches = {
+      "ANGRY_WITH_PLAYER_TREVOR",
+      "ARREST_PLAYER",
+      "BLOCKED_GENERIC",
+      "BLOCKED_IN_PURSUIT",
+      "BUDDY_DOWN",
+      "BUMP",
+      "CHALLENGE_THREATEN",
+      "CHASE_VEHICLE_MEGAPHONE",
+      "CHAT_RESP",
+      "CHAT_STATE",
+      "CLEAR_AREA_MEGAPHONE",
+      "CLEAR_AREA_PANIC_MEGAPHONE",
+      "COMBAT_TAUNT",
+      "COP_ARRIVAL_ANNOUNCE",
+      "COP_ARRIVAL_ANNOUNCE_MEGAPHONE",
+      "COP_ARRIVAL_ANNOUNCE_MEGAPHONE_NO_REVERB",
+      "COP_PEEK",
+      "COP_SEES_GRENADE",
+      "COP_SEES_GRENADE_LAUNCHER",
+      "COP_SEES_GUN",
+      "COP_SEES_MINI_GUN",
+      "COP_SEES_ROCKET_LAUNCHER",
+      "COP_SEES_WEAPON",
+      "COVER_ME",
+      "COVER_YOU",
+      "CRASH_GENERIC",
+      "CRIMINAL_APPREHENDED",
+      "CRIMINAL_GET_IN_CAR",
+      "CRIMINAL_WARNING",
+      "DODGE",
+      "DRAW_GUN",
+      "DUCK",
+      "EXPLOSION_IS_IMMINENT",
+      "FALL_BACK",
+      "FIGHT",
+      "FOOT_CHASE",
+      "FOOT_CHASE_HEADING_EAST",
+      "FOOT_CHASE_HEADING_NORTH",
+      "FOOT_CHASE_HEADING_SOUTH",
+      "FOOT_CHASE_HEADING_WEST",
+      "FOOT_CHASE_LOSING",
+      "FOOT_CHASE_RESPONSE",
+      "GENERIC_BYE",
+      "GENERIC_CURSE_HIGH",
+      "GENERIC_CURSE_MED",
+      "GENERIC_CURSE_MED",
+      "GENERIC_FRIGHTENED_HIGH",
+      "GENERIC_FRIGHTENED_MED",
+      "GENERIC_HI",
+      "GENERIC_INSULT_HIGH",
+      "GENERIC_INSULT_MED",
+      "GENERIC_SHOCKED_HIGH",
+      "GENERIC_SHOCKED_MED",
+      "GENERIC_THANKS",
+      "GENERIC_WAR_CRY",
+      "GENERIC_WHATEVER",
+      "GET_HIM",
+      "GUN_COOL",
+      "JACK_VEHICLE_BACK",
+      "JACKED_GENERIC",
+      "KIFFLOM_GREET",
+      "LOST_SUSPECT_CHOPPER_MEGAPHONE",
+      "MOVE_IN",
+      "MOVE_IN_PERSONAL",
+      "NEED_SOME_HELP",
+      "NO_LOITERING_MEGAPHONE",
+      "OFFICER_DOWN",
+      "PINNED_DOWN",
+      "PROVOKE_BUMPED_INTO",
+      "PROVOKE_FOLLOWING",
+      "PROVOKE_GENERIC",
+      "PROVOKE_STARING",
+      "PROVOKE_TRESPASS",
+      "RELOADING",
+      "REQUEST_BACKUP",
+      "REQUEST_NOOSE",
+      "RESCUE_INJURED_COP",
+      "SETTLE_DOWN",
+      "SHOOTOUT_OPEN_FIRE",
+      "SHOOTOUT_READY",
+      "SHOOTOUT_READY_RESP",
+      "SHOT_TYRE_CHOPPER_MEGAPHONE",
+      "SPOT_SUSPECT_CHOPPER_MEGAPHONE",
+      "STOP_ON_FOOT_MEGAPHONE",
+      "STOP_VEHICLE_BOAT_MEGAPHONE",
+      "STOP_VEHICLE_CAR_MEGAPHONE",
+      "STOP_VEHICLE_CAR_WARNING_MEGAPHONE",
+      "STOP_VEHICLE_GENERIC_MEGAPHONE",
+      "STOP_VEHICLE_GENERIC_WARNING_MEGAPHONE",
+      "SURROUNDED",
+      "SUSPECT_KILLED",
+      "SUSPECT_LOST",
+      "SUSPECT_SPOTTED",
+      "TAKE_COVER",
+      "TRAPPED",
+      "WAIT",
+      "WON_DISPUTE",
+    };
+
+    // S_[MF]_Y_(M|HWAY)?COP_01_(BLACK|WHITE)_(FULL|MINI)_0[1-6]
+    private static string[] voices = {
+      null,
+      "S_F_Y_COP_01_BLACK_FULL_01",
+      "S_F_Y_COP_01_BLACK_FULL_02",
+      "S_F_Y_COP_01_WHITE_FULL_01",
+      "S_F_Y_COP_01_WHITE_FULL_02",
+      "S_M_Y_MCOP_01_WHITE_MINI_01",
+      "S_M_Y_MCOP_01_WHITE_MINI_02",
+      "S_M_Y_MCOP_01_WHITE_MINI_03",
+      "S_M_Y_MCOP_01_WHITE_MINI_04",
+      "S_M_Y_MCOP_01_WHITE_MINI_05",
+      "S_M_Y_MCOP_01_WHITE_MINI_06",
+      "S_M_Y_HWAYCOP_01_BLACK_FULL_01",
+      "S_M_Y_HWAYCOP_01_BLACK_FULL_02",
+      "S_M_Y_HWAYCOP_01_WHITE_FULL_01",
+      "S_M_Y_HWAYCOP_01_WHITE_FULL_02",
+      "S_M_Y_COP_01_WHITE_FULL_01",
+      "S_M_Y_COP_01_WHITE_FULL_02",
+      "S_M_Y_COP_01_WHITE_FULL_03",
+      "S_M_Y_COP_01_WHITE_FULL_04",
+      "S_M_Y_COP_01_WHITE_MINI_01",
+      "S_M_Y_COP_01_WHITE_MINI_02",
+      "S_M_Y_COP_01_WHITE_MINI_03",
+      "S_M_Y_COP_01_WHITE_MINI_04",
+      "S_M_Y_COP_01_BLACK_FULL_01",
+      "S_M_Y_COP_01_BLACK_FULL_02",
+      "S_M_Y_COP_01_BLACK_FULL_03",
+      "S_M_Y_COP_01_BLACK_FULL_04",
+      "S_M_Y_COP_01_BLACK_MINI_01",
+      "S_M_Y_COP_01_BLACK_MINI_02",
+      "S_M_Y_COP_01_BLACK_MINI_03",
+      "S_M_Y_COP_01_BLACK_MINI_04",
+    };
 
     public static void CreateMainMenu()
     {
@@ -21,6 +157,7 @@ namespace CornyFlakezPlugin2
       var pedMenuButton = new UIMenuItem("Ped actions", "Options for making peds do stuff.");
       var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
       var calloutsMenuButton = new UIMenuItem("Callout emulator", "Options relating to emulating LSPDFR callouts.");
+      var speechMenuButton = new UIMenuItem("Speech menu", "Options for playing dialogue.");
       var clearButton = new UIMenuItem("Dismiss peds", "Dismisses all spawned peds and deletes any spawned vehicles.");
       var reloadButton = new UIMenuItem("Reload plugin", "Reloads this plugin.");
       mainMenu.AddItems(
@@ -28,6 +165,7 @@ namespace CornyFlakezPlugin2
           pedMenuButton,
           vehMenuButton,
           calloutsMenuButton,
+          speechMenuButton,
           clearButton,
           reloadButton);
       #endregion
@@ -138,9 +276,20 @@ namespace CornyFlakezPlugin2
       };
       calloutsMenu.AddItems(calloutsList, startCalloutButton, endCalloutButton);
       #endregion
+      #region Speech Menu
+      UIMenu speechMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~SPEECH MENU");
+      var voiceList = new UIMenuListScrollerItem<string>("Voice", "Select the voice to speak with.", voices)
+      {
+        Formatter = rawValue => Regex.Replace(rawValue ?? "Default voice", "^S_([MF])_Y_", "($1) "),
+      };
+      var speechList = new UIMenuListScrollerItem<string>("Speech", "Select the piece of dialoge to be said by the player.", speeches);
+      var variantSelector = new UIMenuNumericScrollerItem<int>("Variant", "Select the dialogue variant to play", 1, 8, 1);
+      speechMenu.AddItems(voiceList, speechList, variantSelector);
+
+      #endregion
       #endregion
 
-      MenuPool menuPool = new MenuPool { mainMenu, spawnMenu, pedMenu, vehMenu, calloutsMenu };
+      MenuPool menuPool = new MenuPool { mainMenu, spawnMenu, pedMenu, vehMenu, calloutsMenu, speechMenu };
 
       foreach (UIMenu menu in menuPool)
       {
@@ -183,10 +332,14 @@ namespace CornyFlakezPlugin2
                 mainMenu.Visible = false;
                 calloutsMenu.Visible = true;
                 break;
-              case 4: // Dismiss button
+              case 4: // Speech menu button
+                mainMenu.Visible = false;
+                speechMenu.Visible = true;
+                break;
+              case 5: // Dismiss button
                 Functions.ClearPedsAndVehicles();
                 break;
-              case 5: // Reload plugin button
+              case 6: // Reload plugin button
                 Functions.ClearPedsAndVehicles();
                 mainMenu.Visible = false;
                 Game.ReloadActivePlugin();
@@ -278,6 +431,19 @@ namespace CornyFlakezPlugin2
                 endCalloutButton.Enabled = false;
                 startCalloutButton.Enabled = true;
                 EntryPoint.currentDebugInfo.activeCallout.End();
+                break;
+            }
+            break;
+          case 5: // Speech menu
+            switch (selectedItemIndex)
+            {
+              case 0: // Voice selector
+              case 1: // Speech selector
+              case 2: // Speech variant selector
+                string voiceName = voiceList.SelectedItem;
+                string speechName = speechList.SelectedItem;
+                int speechVariant = variantSelector.Value;
+                Game.LocalPlayer.Character.PlayAmbientSpeech(voiceName, speechName, speechVariant, SpeechModifier.Standard);
                 break;
             }
             break;
