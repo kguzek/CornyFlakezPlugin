@@ -13,3 +13,6 @@ References
 
 # Project backups
 Backup*
+
+# Installed packages folder
+packages
