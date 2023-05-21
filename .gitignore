@@ -7,3 +7,6 @@ References
 *.csproj
 # Developer build scripts
 *.ps1
+
+# Text files
+*.txt
