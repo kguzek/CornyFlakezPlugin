@@ -1,6 +1,5 @@
 using System.Windows.Forms;
 using Rage;
-using static CornyFlakezPlugin2.Util;
 
 namespace CornyFlakezPlugin2
 {
@@ -15,8 +14,8 @@ namespace CornyFlakezPlugin2
     {
       string modelName = vehicle.Model.Name;
       string notificationBody = $"Commandeering {modelName}...";
-      string vehicleTextureDictionary = GetVehicleTextureDictionary(modelName);
-      PlayIdentificationSpeech();
+      string vehicleTextureDictionary = Util.GetVehicleTextureDictionary(modelName);
+      Util.PlayIdentificationSpeech();
       Game.LogTrivial($"Txd of \"{modelName}\": {vehicleTextureDictionary}");
       if (vehicleTextureDictionary == null)
       {
@@ -42,7 +41,7 @@ namespace CornyFlakezPlugin2
 
     public static void CarjackEventHandler()
     {
-      if (WasKeyHeld(Keys.G, 500))
+      if (Util.WasKeyHeld(Keys.G, 500))
       {
         if (startedCommandeeringVehicle) return;
         startedCommandeeringVehicle = true;

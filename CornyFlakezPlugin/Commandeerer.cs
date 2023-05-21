@@ -1,6 +1,6 @@
 using System.Windows.Forms;
 using Rage;
-using static CornyFlakezPlugin2.Util;
+using LSPD_First_Response.Mod.API;
 
 namespace CornyFlakezPlugin
 {
@@ -9,14 +9,13 @@ namespace CornyFlakezPlugin
   {
     private static bool startedCommandeeringVehicle = false;
 
-    private static readonly Ped player = Game.LocalPlayer.Character;
-
     private static void CommandeerVehicle(Vehicle vehicle)
     {
       string modelName = vehicle.Model.Name;
-      string notificationBody = $"Commandeering {modelName}...";
-      string vehicleTextureDictionary = GetVehicleTextureDictionary(modelName);
-      PlayIdentificationSpeech();
+      string notificationBody = $"{modelName} has been commandeered!";
+      string vehicleTextureDictionary = Util.GetVehicleTextureDictionary(modelName);
+      Util.PlayIdentificationSpeech();
+      Functions.SetPlayerInteractionAction(LSPD_First_Response.Mod.Menus.EInteractionActionType.ShowBadge);
       Game.LogTrivial($"Txd of \"{modelName}\": {vehicleTextureDictionary}");
       if (vehicleTextureDictionary == null)
       {
@@ -42,14 +41,14 @@ namespace CornyFlakezPlugin
 
     public static void CarjackEventHandler()
     {
-      if (WasKeyHeld(Keys.G, 500))
+      if (Util.WasKeyHeld(Keys.G, 500))
       {
         if (startedCommandeeringVehicle) return;
         startedCommandeeringVehicle = true;
 
-        Vehicle[] nearbyVehicles = player.GetNearbyVehicles(1);
+        Vehicle[] nearbyVehicles = Game.LocalPlayer.Character.GetNearbyVehicles(1);
         Vehicle closestVehicle = nearbyVehicles[0];
-        if (player.DistanceTo(closestVehicle) > 10f) return;
+        if (Game.LocalPlayer.Character.DistanceTo(closestVehicle) > 10f) return;
         if (closestVehicle.Occupants.Length == 0) return;
         CommandeerVehicle(closestVehicle);
       }

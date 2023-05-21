@@ -162,7 +162,7 @@ namespace CornyFlakezPlugin2
     {
       #region Menu Population 
       #region Main Menu
-      UIMenu mainMenu = new UIMenu(EntryPoint.PLUGIN_NAME, $"~b~{EntryPoint.PLUGIN_NAME} version ~g~{CornyFlakezPlugin2.EntryPoint.VERSION}");
+      UIMenu mainMenu = new UIMenu(EntryPoint.PluginName, $"~b~{EntryPoint.PluginName} version ~g~{EntryPoint.PluginVersion}");
       var spawnMenuButton = new UIMenuItem("Spawning", "Options for spawning peds and vehicles.");
       var pedMenuButton = new UIMenuItem("Ped actions", "Options for making peds do stuff.");
       var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
@@ -182,7 +182,7 @@ namespace CornyFlakezPlugin2
           reloadButton);
       #endregion
       #region Spawning Menu
-      UIMenu spawnMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~PED AND VEHICLE SPAWNING");
+      UIMenu spawnMenu = new UIMenu(EntryPoint.PluginName, "~b~PED AND VEHICLE SPAWNING");
       Model[] pedModels = new Model[]
       {
                 "s_m_y_cop_01",
@@ -219,7 +219,7 @@ namespace CornyFlakezPlugin2
           vehModelSelector);
       #endregion
       #region Ped Menu
-      UIMenu pedMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~PED ACTIONS");
+      UIMenu pedMenu = new UIMenu(EntryPoint.PluginName, "~b~PED ACTIONS");
       var pedSelector = new UIMenuNumericScrollerItem<int>("Selected ped", "", 1, 1, 1);
       var selectedPedModel = new UIMenuItem("No spawned peds.", "The currently selected ped's model name.")
       {
@@ -249,7 +249,7 @@ namespace CornyFlakezPlugin2
           followMeSelector);
       #endregion
       #region Vehicle Menu
-      UIMenu vehMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~VEHICLE ACTIONS");
+      UIMenu vehMenu = new UIMenu(EntryPoint.PluginName, "~b~VEHICLE ACTIONS");
       var vehSelector = new UIMenuNumericScrollerItem<int>("Selected vehicle", "", 1, 1, 1);
       var selectedVehModel = new UIMenuItem("No spawned vehicle.", "The spawned vehicle's model name.")
       {
@@ -276,8 +276,8 @@ namespace CornyFlakezPlugin2
           vehicleBlipColourSelector);
       #endregion
       #region Callouts Menu
-      UIMenu calloutsMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~CALLOUT EMULATOR");
-      var calloutsList = new UIMenuListScrollerItem<Type>("Selected callout", "", CornyFlakezPlugin2.EntryPoint.calloutTypes)
+      UIMenu calloutsMenu = new UIMenu(EntryPoint.PluginName, "~b~CALLOUT EMULATOR");
+      var calloutsList = new UIMenuListScrollerItem<Type>("Selected callout", "", EntryPoint.CalloutTypes)
       {
         Formatter = callout => Functions.GetCalloutName(callout),
       };
@@ -289,7 +289,7 @@ namespace CornyFlakezPlugin2
       calloutsMenu.AddItems(calloutsList, startCalloutButton, endCalloutButton);
       #endregion
       #region Speech Menu
-      UIMenu speechMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~SPEECH MENU");
+      UIMenu speechMenu = new UIMenu(EntryPoint.PluginName, "~b~SPEECH MENU");
       var voiceList = new UIMenuListScrollerItem<string>("Voice", "Select the voice to speak with.", voices)
       {
         Formatter = rawValue => Regex.Replace(rawValue ?? "Default voice", "^S_([MF])_Y_", "($1) "),
@@ -300,7 +300,7 @@ namespace CornyFlakezPlugin2
 
       #endregion
       #region Animation menu
-      UIMenu animationMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~ANIMATION MENU");
+      UIMenu animationMenu = new UIMenu(EntryPoint.PluginName, "~b~ANIMATION MENU");
       var animationList = new UIMenuListScrollerItem<string>("Animation", "Select the animation to play.", animations.Keys.ToArray<string>());
       var animDictionaryList = new UIMenuListScrollerItem<string>("Dictionary", "Select the animation dictionary.", new string[] {});
       animationMenu.AddItems(animationList, animDictionaryList);
@@ -542,14 +542,14 @@ namespace CornyFlakezPlugin2
     {
       #region Menu Population
       #region Debug Main Menu
-      UIMenu debugMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~DEBUGGING MENU");
+      UIMenu debugMenu = new UIMenu(EntryPoint.PluginName, "~b~DEBUGGING MENU");
       UIMenuItem debugPeds = new UIMenuItem("Peds");
       UIMenuItem debugVehs = new UIMenuItem("Vehicles");
       debugMenu.AddItems(debugPeds, debugVehs);
       #endregion
 
       #region Ped Debugging Menu
-      UIMenu pedDebuggingMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~PED DEBUGGING");
+      UIMenu pedDebuggingMenu = new UIMenu(EntryPoint.PluginName, "~b~PED DEBUGGING");
       var pedSelector = new UIMenuNumericScrollerItem<int>("Selected ped", "", 1, 1, 1);
       var pedModelName = new UIMenuItem("Model name");
       var pedExists = new UIMenuItem("Exist status");
@@ -558,7 +558,7 @@ namespace CornyFlakezPlugin2
       #endregion
 
       #region Vehicle Debugging Menu
-      UIMenu vehDebuggingMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~VEHICLE DEBUGGING");
+      UIMenu vehDebuggingMenu = new UIMenu(EntryPoint.PluginName, "~b~VEHICLE DEBUGGING");
       var vehSelector = new UIMenuNumericScrollerItem<int>("Selected vehicle", "", 1, 1, 1);
       var vehModelName = new UIMenuItem("Model name");
       var vehExists = new UIMenuItem("Exist status");

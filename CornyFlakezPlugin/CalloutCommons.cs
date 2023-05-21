@@ -435,7 +435,7 @@ namespace CornyFlakezPlugin
       }
       Functions.PlayScannerAudio($"{audioMsg}");
       Game.DisplayHelp($"{callingCallout.FriendlyName} is {codeMsg}~w~.", 4000);
-      if (IsLSPDFRPluginRunning($"{Main.PLUGIN_NAME}2.dll"))
+      if (IsLSPDFRPluginRunning($"{Main.PluginName}2.dll"))
         DebugPluginFunctions.PassDebugInfo();
     }
   }

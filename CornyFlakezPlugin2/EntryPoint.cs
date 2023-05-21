@@ -8,7 +8,9 @@ namespace CornyFlakezPlugin2
 {
   public static class EntryPoint
   {
-    public const string PLUGIN_NAME = "CornyFlakezPlugin";
+    public const string PluginName = "CornyFlakezPlugin";
+
+    public static readonly string PluginVersion = GetAssemblyVersion();
 
     public class CalloutDebugInfo
     {
@@ -16,8 +18,8 @@ namespace CornyFlakezPlugin2
       public List<Vehicle> vehicles { get; set; } = new List<Vehicle>();
       public Callout activeCallout { get; set; }
     }
-    public static CalloutDebugInfo currentDebugInfo = new CalloutDebugInfo();
 
+    public static CalloutDebugInfo currentDebugInfo = new CalloutDebugInfo();
 
     public static string GetAssemblyVersion()
     {
@@ -26,10 +28,10 @@ namespace CornyFlakezPlugin2
       return fvi.FileVersion;
     }
 
-    public static readonly string VERSION = GetAssemblyVersion();
-
-    public static readonly List<Type> calloutTypes = new List<Type> {
-            typeof(PoliceEscort) };
+    public static readonly List<Type> CalloutTypes = new List<Type>
+    {
+      typeof(PoliceEscort)
+    };
 
     private static List<Action> EventHandlerActions = new List<Action>
     {
@@ -56,7 +58,7 @@ namespace CornyFlakezPlugin2
       {
         Game.LogTrivial("");
         Game.LogTrivial("==================================================================================");
-        Game.LogTrivial($"{PLUGIN_NAME}: equipping loadout {loadoutName}...");
+        Game.LogTrivial($"{PluginName}: equipping loadout {loadoutName}...");
         XmlNode loadoutNode = xmlDocument.SelectSingleNode($"//WeaponLoadouts/{loadoutName}");
         if (loadoutNode.ChildNodes.Count > 0)
         {

@@ -9,33 +9,29 @@ using System.Xml;
 
 public class Main : Plugin
 {
-  public const string PLUGIN_NAME = "CornyFlakezPlugin";
+  public const string PluginName = "CornyFlakezPlugin";
+
+  public static readonly Version PluginVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
   private static List<Action> EventHandlerActions = new List<Action> { };
+
   private static List<Action> OnDutyEventHandlerActions = new List<Action>
   {
      Commandeerer.CarjackEventHandler
   };
 
-  public static string GetAssemblyVersion()
+  private static readonly List<Type> CalloutTypes = new List<Type>
   {
-    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-    System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-    return fvi.FileVersion;
-  }
-
-  public static readonly string VERSION = GetAssemblyVersion();
-
-  private static readonly List<Type> calloutTypes = new List<Type> {
-        typeof(VehiclePursuit),
-        typeof(PoliceEscort) };
+    typeof(VehiclePursuit),
+    typeof(PoliceEscort)
+  };
 
   public override void Initialize()
   {
     Functions.OnOnDutyStateChanged += OnOnDutyStateChangedHandler;
     Game.LogTrivial("");
     Game.LogTrivial("==================================================================================");
-    Game.LogTrivial($"{PLUGIN_NAME} {VERSION} has been initialised.");
+    Game.LogTrivial($"{PluginName} {PluginVersion} has been initialised.");
     Game.LogTrivial("==================================================================================");
     Game.LogTrivial("");
     DataManagement.rootDirectory = Environment.CurrentDirectory;
@@ -45,10 +41,18 @@ public class Main : Plugin
     GameFiber.StartNew(HandleEventHandlerActions);
   }
 
+  public override void Finally()
+  {
+    Game.LogTrivial($"{PluginName} has been cleaned up.");
+  }
+
   private static void HandleEventHandlerActions()
   {
+    Game.LogTrivial("Handling event handlers!");
     while (true)
     {
+      GameFiber.Yield();
+      
       foreach (Action eventHandler in EventHandlerActions)
       {
         eventHandler();
@@ -56,34 +60,28 @@ public class Main : Plugin
     }
   }
 
-  public override void Finally()
-  {
-    Game.LogTrivial($"{PLUGIN_NAME} has been cleaned up.");
-  }
+  private delegate void EventHandlerHandler(Action action);
 
   private static void OnOnDutyStateChangedHandler(bool OnDuty)
   {
+    EventHandlerHandler eventHandlerHandler;
     if (OnDuty)
     {
       GiveLoadout("OnDuty");
+      eventHandlerHandler = (Action action) => EventHandlerActions.Add(action);
       RegisterCallouts();
-      Game.DisplayNotification($"{PLUGIN_NAME} {VERSION} has loaded successfully.");
-
-      // Start handling events that should be handled when on duty
-      foreach (Action onDutyOnlyAction in OnDutyEventHandlerActions)
-      {
-        EventHandlerActions.Add(onDutyOnlyAction);
-      }
+      Game.DisplayNotification("web_lossantospolicedept", "web_lossantospolicedept", PluginName, $"~y~v{PluginVersion} ~o~by Konrad Guzek", "Plugin ~g~successfully loaded~w~!");
     }
     else
     {
       GiveLoadout("OffDuty");
-
-      // Stop handling on duty-only events
-      foreach (Action onDutyOnlyAction in OnDutyEventHandlerActions)
-      {
-        EventHandlerActions.Remove(onDutyOnlyAction);
-      }
+      eventHandlerHandler = (Action action) => EventHandlerActions.Remove(action);
+    }
+    // Start or stop handling on duty-only events
+    foreach (Action onDutyOnlyAction in OnDutyEventHandlerActions)
+    {
+      Game.LogTrivial($"Deregistering event handler action {onDutyOnlyAction}");
+      eventHandlerHandler(onDutyOnlyAction);
     }
 
   }
@@ -92,8 +90,8 @@ public class Main : Plugin
   {
     Game.LogTrivial("");
     Game.LogTrivial("==================================================================================");
-    calloutTypes.ForEach(callout => Functions.RegisterCallout(callout));
-    Game.LogTrivial($"Successfully registered all {PLUGIN_NAME} callouts.");
+    CalloutTypes.ForEach(callout => Functions.RegisterCallout(callout));
+    Game.LogTrivial($"Successfully registered all {PluginName} callouts.");
     Game.LogTrivial("==================================================================================");
     Game.LogTrivial("");
   }
@@ -105,7 +103,7 @@ public class Main : Plugin
     {
       Game.LogTrivial("");
       Game.LogTrivial("==================================================================================");
-      Game.LogTrivial($"{PLUGIN_NAME}: equipping loadout {loadoutName}...");
+      Game.LogTrivial($"{PluginName}: equipping loadout {loadoutName}...");
       XmlNode loadoutNode = xmlDocument.SelectSingleNode($"//WeaponLoadouts/{loadoutName}");
       if (loadoutNode.ChildNodes.Count > 0)
       {
@@ -166,7 +164,7 @@ public class Main : Plugin
     }
     Game.LogTrivial("");
     Game.LogTrivial("==================================================================================");
-    Game.LogTrivial($"{PLUGIN_NAME}: Could not resolve assembly '{missingAssemblyName}'.");
+    Game.LogTrivial($"{PluginName}: Could not resolve assembly '{missingAssemblyName}'.");
     Game.LogTrivial("==================================================================================");
     Game.LogTrivial("");
     return null;

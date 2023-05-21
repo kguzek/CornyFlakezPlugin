@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Rage;
 
-namespace CornyFlakezPlugin2
+namespace CornyFlakezPlugin
 {
   public static class Util
   {
@@ -116,9 +116,7 @@ namespace CornyFlakezPlugin2
 
     public static void PlayIdentificationSpeech()
     {
-      // TODO: Change me
-      // string agency = LSPD_First_Response.Mod.API.Functions.GetCurrentAgencyScriptName();
-      string agency = "lspd";
+      string agency = LSPD_First_Response.Mod.API.Functions.GetCurrentAgencyScriptName();
       (string, int[])[] speeches;
       bool usingSheriffSpeech = false;
       identificationSpeeches.TryGetValue(agency, out speeches);
