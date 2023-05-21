@@ -1,3 +1,4 @@
+& $PSScriptRoot\..\Increment-BuildNumber.ps1 -PluginRoot $PSScriptRoot
 dotnet build
 if (-not $?) {
   throw 'Build failure -- aborting script'
