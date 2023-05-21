@@ -38,7 +38,6 @@ namespace CornyFlakezPlugin
     public static void InitialiseColourList()
     {
       string[] colourAudioFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + @".\LSPDFR\audio\scanner\COLOUR");
-
       coloursWithAudio.RemoveAll(c => !colourAudioFiles.Any(
           f => Path.GetFileName(f) == GetColourAudioName(c) + "_01.wav"));
     }
