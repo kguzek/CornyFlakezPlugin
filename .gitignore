@@ -10,3 +10,6 @@ References
 
 # Text files
 *.txt
+
+# Project backups
+Backup*
