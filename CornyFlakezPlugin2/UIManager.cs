@@ -148,6 +148,16 @@ namespace CornyFlakezPlugin2
       "S_M_Y_COP_01_BLACK_MINI_04",
     };
 
+    private static Dictionary<string, string[]> animations = new Dictionary<string, string[]>() {
+      {"prop_fib_badge-0", new string[] {"fbi_5b_mcs_1-0"} },
+      {"prop_fib_badge-1", new string[] {"fbi_5b_mcs_1-1"} },
+      { "prop_fib_badge-2", new string[] { "fbi_5b_mcs_1-2"} },
+      { "prop_fib_badge-3", new string[] { "fbi_5b_mcs_1-3"} },
+      { "player_one_dual-9", new string[] { "paper_1_rcm_alt1-9"} },
+      { "issue_ticket_cop", new string[] {"veh@busted_low", "veh@busted_std", "veh@busted_van"} },
+      { "issue_ticket_crim", new string[] {"veh@busted_low", "veh@busted_std", "veh@busted_van"} }
+    };
+
     public static void CreateMainMenu()
     {
       #region Menu Population 
@@ -158,6 +168,7 @@ namespace CornyFlakezPlugin2
       var vehMenuButton = new UIMenuItem("Vehicle actions", "Options relating to spawned vehicles.");
       var calloutsMenuButton = new UIMenuItem("Callout emulator", "Options relating to emulating LSPDFR callouts.");
       var speechMenuButton = new UIMenuItem("Speech menu", "Options for playing dialogue.");
+      var animationMenuButton = new UIMenuItem("Animation menu", "Options for playing animations.");
       var clearButton = new UIMenuItem("Dismiss peds", "Dismisses all spawned peds and deletes any spawned vehicles.");
       var reloadButton = new UIMenuItem("Reload plugin", "Reloads this plugin.");
       mainMenu.AddItems(
@@ -166,6 +177,7 @@ namespace CornyFlakezPlugin2
           vehMenuButton,
           calloutsMenuButton,
           speechMenuButton,
+          animationMenuButton,
           clearButton,
           reloadButton);
       #endregion
@@ -287,9 +299,15 @@ namespace CornyFlakezPlugin2
       speechMenu.AddItems(voiceList, speechList, variantSelector);
 
       #endregion
+      #region Animation menu
+      UIMenu animationMenu = new UIMenu(EntryPoint.PLUGIN_NAME, "~b~ANIMATION MENU");
+      var animationList = new UIMenuListScrollerItem<string>("Animation", "Select the animation to play.", animations.Keys.ToArray<string>());
+      var animDictionaryList = new UIMenuListScrollerItem<string>("Dictionary", "Select the animation dictionary.", new string[] {});
+      animationMenu.AddItems(animationList, animDictionaryList);
+      #endregion
       #endregion
 
-      MenuPool menuPool = new MenuPool { mainMenu, spawnMenu, pedMenu, vehMenu, calloutsMenu, speechMenu };
+      MenuPool menuPool = new MenuPool { mainMenu, spawnMenu, pedMenu, vehMenu, calloutsMenu, speechMenu, animationMenu };
 
       foreach (UIMenu menu in menuPool)
       {
@@ -297,6 +315,7 @@ namespace CornyFlakezPlugin2
         if (menu != mainMenu)
         {
           menu.OnMenuClose += OnMenuClose;
+          menu.OnScrollerChange += delegate { updateMenuItems(); };
         }
       }
 
@@ -316,33 +335,18 @@ namespace CornyFlakezPlugin2
           case 0: // Main menu
             switch (selectedItemIndex)
             {
-              case 0: // Spawning menu button
-                mainMenu.Visible = false;
-                spawnMenu.Visible = true;
-                break;
-              case 1: // Ped menu button
-                mainMenu.Visible = false;
-                pedMenu.Visible = true;
-                break;
-              case 2: // Vehicle menu button
-                mainMenu.Visible = false;
-                vehMenu.Visible = true;
-                break;
-              case 3: // Callouts menu button
-                mainMenu.Visible = false;
-                calloutsMenu.Visible = true;
-                break;
-              case 4: // Speech menu button
-                mainMenu.Visible = false;
-                speechMenu.Visible = true;
-                break;
-              case 5: // Dismiss button
+              case 6: // Dismiss button
                 Functions.ClearPedsAndVehicles();
                 break;
-              case 6: // Reload plugin button
+              case 7: // Reload plugin button
                 Functions.ClearPedsAndVehicles();
                 mainMenu.Visible = false;
                 Game.ReloadActivePlugin();
+                break;
+              default:
+                // Opens the corresponding menu according to the button index
+                mainMenu.Visible = false;
+                menuPool.ElementAt(selectedItemIndex + 1).Visible = true;
                 break;
             }
             break;
@@ -447,6 +451,11 @@ namespace CornyFlakezPlugin2
                 break;
             }
             break;
+          case 6: // Animation menu
+            string animationName = animationList.SelectedItem;
+            string animationDictionary = animDictionaryList.SelectedItem;
+            Game.LocalPlayer.Character.Tasks.PlayAnimation(animationDictionary, animationName, 1, AnimationFlags.None);
+            break;
         }
       }
 
@@ -475,6 +484,7 @@ namespace CornyFlakezPlugin2
         vehicleBlipColourSelector.Enabled = carsHaveBeenSpawned && toggleVehicleBlipCheckbox.Checked;
         selectedVehModel.Text = carsHaveBeenSpawned ?
             Functions.vehicles[vehSelector.Value - 1].Key.Model.Name : "No spawned vehicle.";
+        animDictionaryList.Items = animations[animationList.SelectedItem];
       }
 
       GameFiber.StartNew(ProcessMenus);
