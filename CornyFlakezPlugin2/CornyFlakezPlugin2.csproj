@@ -12,10 +12,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RagePluginHookSDK">
-      <HintPath>.\References\RagePluginHookSDK.dll</HintPath>
+      <HintPath>..\References\RagePluginHookSDK.dll</HintPath>
     </Reference>
     <Reference Include="RageNativeUI">
-      <HintPath>.\References\RageNativeUI.dll</HintPath>
+      <HintPath>..\References\RageNativeUI.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
