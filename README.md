@@ -37,6 +37,12 @@ The supported callsign format is Division-Unit-Beat, where Unit is a code word f
 
 Loadouts can be defined in `WeaponLoadouts.xml` in the plugin directory: `Plugins/LSPDFR/CornyFlakezPlugin`. These will be applied when the user goes on duty.
 
+### Commandeering
+
+When using the LSPDFR "Flash badge" action near the front of a vehicle, the occupants leave the vehicle allowing you to commandeer it.
+You can activate the built-in action by using the interaction menu or by pressing the GTA V Action key (default: caps lock) when your action is set to "Flash badge".
+This feature only works when you are within a certain distance of the front of the closest vehicle to you and when that vehicle has at least one occupant.
+
 ### Callouts
 
 Currently, there are two added callouts in CornyFlakezPlugin.
