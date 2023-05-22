@@ -18,10 +18,10 @@ To do this there is an included build script for Windows which assumes your game
 (`C:\Program Files\Rockstar Games\Grand Theft Auto V`).
 ```pwsh
 cd CornyFlakezPlugin
-.\build.ps1
+.\Build-Plugins.ps1
 ```
-Otherwise, you may do this step manually. You can open the `build.ps1` file with a text editor and see what it does.
-The main steps are running `dotnet build` and copying the build output into the GTA V/Plugins/LSPDFR folder.
+Otherwise, you may do this step manually. You can open the `Build-Plugins.ps1` file with a text editor and see what it does.
+The main steps are running `dotnet build` and copying the build output into the appropriate plugin folders, as well as copying the referenced system DLLs to the root game folder.
 
 ## CornyFlakezPlugin
 
@@ -63,6 +63,6 @@ This menu also contains a `Reload plugin` option, which further helps with devel
 
 ### Debug menu
 
-This menu can be opened by pressing `[` and it contains information regarding peds and vehicles belonging to the active callout.s
+This menu can be opened by pressing `[` and it contains information regarding peds and vehicles belonging to the active callouts.
 
 #### Thank you for reading!
