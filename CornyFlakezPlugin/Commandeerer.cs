@@ -1,61 +1,80 @@
-using System.Windows.Forms;
 using Rage;
 using LSPD_First_Response.Mod.API;
+using System;
 
 namespace CornyFlakezPlugin
 {
 
   public static class Commandeerer
   {
-    private static bool startedCommandeeringVehicle = false;
+    private const float MaxCommandeerDistance = 3f;
+
+    private const float CommandeerVehicleDelayMs = 1500;
+
+    private static DateTime? startedCommandeeringVehicleAt = null;
+
+    private static Vehicle vehicleToBeCommandeered = null;
 
     private static void CommandeerVehicle(Vehicle vehicle)
     {
       string modelName = vehicle.Model.Name;
-      string notificationBody = $"{modelName} has been commandeered!";
-      string vehicleTextureDictionary = Util.GetVehicleTextureDictionary(modelName);
-      Util.PlayIdentificationSpeech();
-      Functions.SetPlayerInteractionAction(LSPD_First_Response.Mod.Menus.EInteractionActionType.ShowBadge);
-      Game.LogTrivial($"Txd of \"{modelName}\": {vehicleTextureDictionary}");
-      if (vehicleTextureDictionary == null)
-      {
-        Game.DisplayNotification(notificationBody);
-      }
-      else
-      {
-        Game.DisplayNotification(vehicleTextureDictionary, modelName, "CornyFlakezPlugin", "(civilian vehicle)", notificationBody);
-      }
-      foreach (Ped vehicleOccupant in vehicle.Occupants)
-      {
-        LeaveVehicleFlags leaveFlags = LeaveVehicleFlags.None;
-        if (vehicleOccupant == vehicle.Driver)
-        {
-          leaveFlags |= LeaveVehicleFlags.LeaveDoorOpen;
-        }
-        vehicleOccupant.RelationshipGroup.SetRelationshipWith(RelationshipGroup.Player, Relationship.Respect);
-        vehicleOccupant.Tasks.LeaveVehicle(vehicle, leaveFlags);
-        vehicleOccupant.Tasks.Wander();
-        vehicleOccupant.Dismiss();
-      }
+      string notificationBody = $"~y~{modelName}~w~ has been ~g~commandeered~w~!";
+      string agencyName = Functions.GetCurrentAgencyScriptName().ToUpper();
+      Game.DisplayNotification(Main.PoliceTxd, Main.PoliceTxd, agencyName, "~b~Official Police Business", notificationBody);
+      vehicleToBeCommandeered = vehicle;
+    }
+
+    private static void CheckForVehiclesToBeCommandeered(Ped player)
+    {
+      Vehicle[] nearbyVehicles = player.GetNearbyVehicles(1);
+      Vehicle closestVehicle = nearbyVehicles[0];
+      if (player.DistanceTo(closestVehicle.FrontPosition) > MaxCommandeerDistance) return;
+      startedCommandeeringVehicleAt = DateTime.Now;
+      if (closestVehicle.Occupants.Length == 0) return;
+      CommandeerVehicle(closestVehicle);
     }
 
     public static void CarjackEventHandler()
     {
-      if (Util.WasKeyHeld(Keys.G, 500))
+      Ped player = Game.LocalPlayer.Character;
+      bool startedCommandeeringVehicle = startedCommandeeringVehicleAt != null;
+      // Check if the player is trying to commandeer a vehicle
+      if (Functions.IsPedShowingBadge(player))
       {
-        if (startedCommandeeringVehicle) return;
-        startedCommandeeringVehicle = true;
-
-        Vehicle[] nearbyVehicles = Game.LocalPlayer.Character.GetNearbyVehicles(1);
-        Vehicle closestVehicle = nearbyVehicles[0];
-        if (Game.LocalPlayer.Character.DistanceTo(closestVehicle) > 10f) return;
-        if (closestVehicle.Occupants.Length == 0) return;
-        CommandeerVehicle(closestVehicle);
+        if (!startedCommandeeringVehicle)
+        {
+          CheckForVehiclesToBeCommandeered(player);
+        }
+        else if (vehicleToBeCommandeered == null)
+        {
+          // Don't do anything in the period after the vehicle was commandeered and before the animation finishes
+          return;
+        }
       }
-      else if (startedCommandeeringVehicle)
+      // Don't do anything else if the player hasn't started commandeering
+      if (!startedCommandeeringVehicle) return;
+      // Allow the player to commandeer a new vehicle if there was no suitable vehicle found after the attempt
+      if (vehicleToBeCommandeered == null)
       {
-        startedCommandeeringVehicle = false;
+        startedCommandeeringVehicleAt = null;
+        return;
       }
+      // Actually make the peds exit the vehicle after the set delay has passed
+      if (DateTime.Now < startedCommandeeringVehicleAt + TimeSpan.FromMilliseconds(CommandeerVehicleDelayMs)) return;
+      foreach (Ped vehicleOccupant in vehicleToBeCommandeered.Occupants)
+      {
+        LeaveVehicleFlags leaveFlags = LeaveVehicleFlags.None;
+        if (vehicleOccupant == vehicleToBeCommandeered.Driver)
+        {
+          leaveFlags |= LeaveVehicleFlags.LeaveDoorOpen;
+        }
+        vehicleOccupant.RelationshipGroup.SetRelationshipWith(RelationshipGroup.Player, Relationship.Respect);
+        vehicleOccupant.Tasks.LeaveVehicle(vehicleToBeCommandeered, leaveFlags);
+        vehicleOccupant.Tasks.Wander();
+        vehicleOccupant.Dismiss();
+      }
+      vehicleToBeCommandeered = null;
     }
+
   }
 }

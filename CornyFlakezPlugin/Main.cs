@@ -11,6 +11,8 @@ public class Main : Plugin
 {
   public const string PluginName = "CornyFlakezPlugin";
 
+  public const string PoliceTxd = "web_lossantospolicedept";
+
   public static readonly Version PluginVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
   private static List<Action> EventHandlerActions = new List<Action> { };
@@ -70,7 +72,7 @@ public class Main : Plugin
       GiveLoadout("OnDuty");
       eventHandlerHandler = (Action action) => EventHandlerActions.Add(action);
       RegisterCallouts();
-      Game.DisplayNotification("web_lossantospolicedept", "web_lossantospolicedept", PluginName, $"~y~v{PluginVersion} ~o~by Konrad Guzek", "Plugin ~g~successfully loaded~w~!");
+      Game.DisplayNotification(PoliceTxd, PoliceTxd, PluginName, $"~y~v{PluginVersion} ~o~by Konrad Guzek", "Plugin ~g~successfully loaded~w~!");
     }
     else
     {
